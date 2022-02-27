@@ -19,3 +19,6 @@ The VSCode extension is present inside the **./automate-task** folder.
 
 1. The whole `./automate-task/link_files` directory is gitignored. The output file is not pushed to the repository.
 2. Refer to `./automate-task/vsc-extension-quickstart.md` for more information on setting up the extension.
+3. The format of the output file is as described below:
+
+[Comment start line],[Comment_start_character],[Comment end line],[Comment_end_character],[Code start line],[Code_start_character],[Code end line],[Code_end_character] \`[Message]\`
