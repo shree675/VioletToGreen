@@ -1,6 +1,6 @@
 # violet-to-green README
 
-This is the README for your extension "violet-to-green". After writing up a brief description, we recommend including the following sections.
+Note: The automation tool is inside ```./automatic_annotation_tool``` folder. Open the README.md file inside the mentioned directory for information on how to use the extension.
 
 ## Features
 
