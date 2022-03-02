@@ -4,6 +4,7 @@ import path = require("path");
 
 export function activate(context: vscode.ExtensionContext) {
   var formattedStrings: string = "";
+
   let disposableSave = vscode.commands.registerCommand(
     "automate-task.save",
     () => {
@@ -11,20 +12,30 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.window.showErrorMessage("No links to save");
         return;
       }
-      var dir = path.resolve(__dirname, "../link_files");
+      var dir = path.resolve(
+        __dirname,
+        "../../../Dataset/RealWorldData/Annotations"
+      );
 
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir);
       }
+
+      const filepath = vscode.window.activeTextEditor?.document.fileName;
+      const filename = filepath
+        ?.replace(/^.*[\\\/]/, "")
+        .replace(/\..*/, ".txt");
+
       fs.writeFile(
-        path.resolve(__dirname, "../link_files/output_links.txt"),
+        path.resolve(__dirname, dir, filename!),
         formattedStrings,
         function (err) {
           if (err) {
             throw err;
           }
+          formattedStrings = "";
           vscode.window.showInformationMessage(
-            "Links saved to ./link_files/output_links.txt"
+            "Links saved to " + path.resolve(__dirname, dir)
           );
         }
       );
