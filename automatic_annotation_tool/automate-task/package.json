@@ -1,5 +1,5 @@
 {
-  "name": "automate-task",
+	"name": "automate-task",
 	"displayName": "Automate Task",
 	"description": "",
 	"version": "0.0.1",
@@ -10,7 +10,7 @@
 		"Other"
 	],
 	"activationEvents": [
-        "onCommand:automate-task.automate",
+		"onCommand:automate-task.automate",
 		"onCommand:automate-task.save"
 	],
 	"main": "./out/extension.js",
