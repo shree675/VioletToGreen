@@ -1,3 +1,4 @@
+//@ts-ignore
 import App from "../components/SidebarReadability.svelte";
 
 const app = new App({

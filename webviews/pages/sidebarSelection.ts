@@ -1,3 +1,4 @@
+//@ts-ignore
 import App from "../components/SidebarSelection.svelte";
 
 const app = new App({

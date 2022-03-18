@@ -3,11 +3,15 @@
 
   var text1 = "";
   var text2 = "";
+  var rawText1: any;
+  var rawText2: any;
 
   const formatString = (val: {
     string: string;
     startLine: string;
     endLine: string;
+    startCharacter: string;
+    endCharacter: string;
   }) => {
     let str = "【" + (val.startLine + 1) + " - " + (val.endLine + 1) + "】";
     if (val.string.length >= 20) {
@@ -28,9 +32,11 @@
       const message = event.data;
       if (message.type === "responseSelection" && message.value.string !== "") {
         if (text1 === "") {
-          text1 = formatString(message.value);
+          rawText1 = message.value;
+          text1 = formatString(rawText1);
         } else {
-          text2 = formatString(message.value);
+          rawText2 = message.value;
+          text2 = formatString(rawText2);
         }
       }
     });
@@ -84,6 +90,28 @@
           console.log("Linked successfully");
           text1 = "";
           text2 = "";
+          const link = [
+            {
+              startLine: rawText1.startLine + 1,
+              endLine: rawText1.endLine + 1,
+              string: rawText1.string,
+              startCharacter: rawText1.startCharacter + 1,
+              endCharacter: rawText1.endCharacter + 1,
+              filepath: "",
+            },
+            {
+              startLine: rawText2.startLine + 1,
+              endLine: rawText2.endLine + 1,
+              string: rawText2.string,
+              startCharacter: rawText2.startCharacter + 1,
+              endCharacter: rawText2.endCharacter + 1,
+              filepath: "",
+            },
+          ];
+          tsvscode.postMessage({
+            type: "addLink",
+            value: link,
+          });
         }}>Link</button
       >
     </div>
