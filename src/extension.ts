@@ -1,22 +1,38 @@
 import * as vscode from "vscode";
-import { SidebarProvider } from "./SidebarProvider";
-import { SidebarSubProvider } from "./SidebarSubProvider";
+import { SidebarSelectionProvider } from "./SidebarSelectionProvider";
+import { SidebarReadabilityProvider } from "./SidebarReadabilityProvider";
+import { SidebarLinksProvider } from "./SidebarLinksProvider";
 
 export function activate(context: vscode.ExtensionContext) {
-  const sidebarProvider = new SidebarProvider(context.extensionUri);
-  const sidebarSubProvider = new SidebarSubProvider(context.extensionUri);
+  // let f = vscode.workspace?.workspaceFolders![0].uri.fsPath;
+  // console.log(f);
+  const sidebarLinksProvider = new SidebarLinksProvider(context.extensionUri);
+  const sidebarSelectionProvider = new SidebarSelectionProvider(
+    context.extensionUri,
+    sidebarLinksProvider
+  );
+  const sidebarReadabilityProvider = new SidebarReadabilityProvider(
+    context.extensionUri
+  );
 
   context.subscriptions.push(
     vscode.window.registerWebviewViewProvider(
-      "violet-to-green-sidebar",
-      sidebarProvider
+      "violet-to-green-selection",
+      sidebarSelectionProvider
     )
   );
 
   context.subscriptions.push(
     vscode.window.registerWebviewViewProvider(
-      "violet-to-green-sub",
-      sidebarSubProvider
+      "violet-to-green-readability",
+      sidebarReadabilityProvider
+    )
+  );
+
+  context.subscriptions.push(
+    vscode.window.registerWebviewViewProvider(
+      "violet-to-green-links",
+      sidebarLinksProvider
     )
   );
 
