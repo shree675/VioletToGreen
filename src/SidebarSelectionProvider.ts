@@ -1,11 +1,15 @@
 import * as vscode from "vscode";
 import { getNonce } from "./getNonce";
+import { SidebarLinksProvider } from "./SidebarLinksProvider";
 
-export class SidebarSubProvider implements vscode.WebviewViewProvider {
+export class SidebarSelectionProvider implements vscode.WebviewViewProvider {
   _view?: vscode.WebviewView;
   _doc?: vscode.TextDocument;
 
-  constructor(private readonly _extensionUri: vscode.Uri) {}
+  constructor(
+    private readonly _extensionUri: vscode.Uri,
+    private _sidebarLinksProvider: SidebarLinksProvider
+  ) {}
 
   public resolveWebviewView(webviewView: vscode.WebviewView) {
     this._view = webviewView;
@@ -33,9 +37,25 @@ export class SidebarSubProvider implements vscode.WebviewViewProvider {
           vscode.window.showErrorMessage(data.value);
           break;
         }
-        case "request": {
+        case "requestSelection": {
           const editor = vscode.window.activeTextEditor;
           const selectionString = editor?.document.getText(editor.selection);
+          this._view?.webview.postMessage({
+            type: "responseSelection",
+            value: {
+              string: selectionString,
+              startLine: editor?.selection.start.line,
+              endLine: editor?.selection.end.line,
+            },
+          });
+          break;
+        }
+        case "requestForLinks": {
+          console.log("requestForLinks");
+          this._sidebarLinksProvider._view?.webview.postMessage({
+            type: "requestForLinks",
+            value: "requestForLinks",
+          });
           break;
         }
       }
@@ -55,10 +75,18 @@ export class SidebarSubProvider implements vscode.WebviewViewProvider {
     );
 
     const scriptUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this._extensionUri, "out", "compiled/sidebarSub.js")
+      vscode.Uri.joinPath(
+        this._extensionUri,
+        "out",
+        "compiled/sidebarSelection.js"
+      )
     );
     const styleMainUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this._extensionUri, "out", "compiled/sidebarSub.css")
+      vscode.Uri.joinPath(
+        this._extensionUri,
+        "out",
+        "compiled/sidebarSelection.css"
+      )
     );
 
     // Use a nonce to only allow a specific script to be run.

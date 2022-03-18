@@ -10,6 +10,7 @@
     "Other"
   ],
   "activationEvents": [
+    "onStartupFinished",
     "onCommand:violet-to-green.helloWorld",
     "onCommand:violet-to-green.refresh",
     "onView:violet-to-green-sidebar"
@@ -20,7 +21,7 @@
       "activitybar": [
         {
           "id": "violet-to-green-sidebar-view",
-          "title": "First Panel",
+          "title": "Violet To Green",
           "icon": "media/checklist.svg"
         }
       ]
@@ -29,17 +30,24 @@
       "violet-to-green-sidebar-view": [
         {
           "type": "webview",
-          "id": "violet-to-green-sidebar",
-          "name": "First Panel",
+          "id": "violet-to-green-selection",
+          "name": "Selection",
           "icon": "media/checklist.svg",
-          "contextualTitle": "First Panel"
+          "contextualTitle": "Selection"
         },
         {
           "type": "webview",
-          "id": "violet-to-green-sub",
-          "name": "Second Panel",
+          "id": "violet-to-green-readability",
+          "name": "Readability Metrics",
           "icon": "media/checklist.svg",
-          "contextualTitle": "Second Panel"
+          "contextualTitle": "Readability Metrics"
+        },
+        {
+          "type": "webview",
+          "id": "violet-to-green-links",
+          "name": "Links",
+          "icon": "media/checklist.svg",
+          "contextualTitle": "Links"
         }
       ]
     },
