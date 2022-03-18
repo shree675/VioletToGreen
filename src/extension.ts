@@ -1,11 +1,38 @@
 import * as vscode from "vscode";
+const fs = require("fs");
+const path = require("path");
 import { SidebarSelectionProvider } from "./SidebarSelectionProvider";
 import { SidebarReadabilityProvider } from "./SidebarReadabilityProvider";
 import { SidebarLinksProvider } from "./SidebarLinksProvider";
 
+const createFile = () => {
+  var workspace = vscode.workspace?.workspaceFolders;
+  if (workspace === null || workspace === undefined) {
+    vscode.window.showErrorMessage("No workspace found");
+    return false;
+  }
+  var filepath = path.join(
+    workspace[0].uri.fsPath,
+    "violettogreen.config.json"
+  );
+  fs.open(filepath, "r", (fileNotExists: Boolean, file: any) => {
+    if (fileNotExists) {
+      fs.writeFile(filepath, JSON.stringify({}), (err: any) => {
+        if (err) {
+          vscode.window.showErrorMessage(err);
+          return false;
+        }
+      });
+    }
+  });
+  return true;
+};
+
 export function activate(context: vscode.ExtensionContext) {
-  // let f = vscode.workspace?.workspaceFolders![0].uri.fsPath;
-  // console.log(f);
+  if (!createFile()) {
+    return;
+  }
+
   const sidebarLinksProvider = new SidebarLinksProvider(context.extensionUri);
   const sidebarSelectionProvider = new SidebarSelectionProvider(
     context.extensionUri,

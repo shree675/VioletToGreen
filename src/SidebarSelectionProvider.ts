@@ -1,4 +1,6 @@
 import * as vscode from "vscode";
+const path = require("path");
+const fs = require("fs");
 import { getNonce } from "./getNonce";
 import { SidebarLinksProvider } from "./SidebarLinksProvider";
 
@@ -20,6 +22,11 @@ export class SidebarSelectionProvider implements vscode.WebviewViewProvider {
     };
 
     webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
+
+    const filepath = path.join(
+      vscode.workspace?.workspaceFolders![0].uri.fsPath,
+      "violettogreen.config.json"
+    );
 
     webviewView.webview.onDidReceiveMessage((data: any) => {
       switch (data.type) {
@@ -46,6 +53,8 @@ export class SidebarSelectionProvider implements vscode.WebviewViewProvider {
               string: selectionString,
               startLine: editor?.selection.start.line,
               endLine: editor?.selection.end.line,
+              startCharacter: editor?.selection.start.character,
+              endCharacter: editor?.selection.end.character,
             },
           });
           break;
@@ -55,6 +64,21 @@ export class SidebarSelectionProvider implements vscode.WebviewViewProvider {
           this._sidebarLinksProvider._view?.webview.postMessage({
             type: "requestForLinks",
             value: "requestForLinks",
+          });
+          break;
+        }
+        case "addLink": {
+          fs.readFile(filepath, (err: any, fileData: any) => {
+            var links = JSON.parse(fileData);
+            links = [data.value, ...links];
+            fs.writeFile(filepath, JSON.stringify(links), (err: any) => {
+              if (err) {
+                vscode.window.showErrorMessage(err);
+              }
+            });
+            if (err) {
+              vscode.window.showErrorMessage(err);
+            }
           });
           break;
         }

@@ -1,4 +1,6 @@
 import * as vscode from "vscode";
+const path = require("path");
+const fs = require("fs");
 import { getNonce } from "./getNonce";
 
 export class SidebarLinksProvider implements vscode.WebviewViewProvider {
@@ -18,6 +20,11 @@ export class SidebarLinksProvider implements vscode.WebviewViewProvider {
 
     webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
 
+    const filepath = path.join(
+      vscode.workspace?.workspaceFolders![0].uri.fsPath,
+      "violettogreen.config.json"
+    );
+
     webviewView.webview.onDidReceiveMessage((data: any) => {
       switch (data.type) {
         case "info": {
@@ -36,6 +43,30 @@ export class SidebarLinksProvider implements vscode.WebviewViewProvider {
         }
         case "request": {
           this._view?.webview.postMessage({ type: "response", value: "hello" });
+          break;
+        }
+        case "requestForConfigLinks": {
+          var links;
+
+          fs.readFile(filepath, (err: any, fileData: any) => {
+            links = JSON.parse(fileData);
+            if (err) {
+              vscode.window.showErrorMessage(err);
+            }
+            this._view?.webview.postMessage({
+              type: "configLinks",
+              value: links,
+            });
+          });
+          break;
+        }
+        case "updateConfigLinks": {
+          fs.writeFile(filepath, JSON.stringify(data.value), (err: any) => {
+            if (err) {
+              vscode.window.showErrorMessage(err);
+              return false;
+            }
+          });
           break;
         }
       }
