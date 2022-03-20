@@ -74,7 +74,21 @@ export class SidebarSelectionProvider implements vscode.WebviewViewProvider {
             fs.writeFile(filepath, JSON.stringify(links), (err: any) => {
               if (err) {
                 vscode.window.showErrorMessage(err);
+                return;
               }
+              var links;
+
+              fs.readFile(filepath, (err: any, fileData: any) => {
+                links = JSON.parse(fileData);
+                if (err) {
+                  vscode.window.showErrorMessage(err);
+                  return;
+                }
+                this._sidebarLinksProvider._view?.webview.postMessage({
+                  type: "configLinks",
+                  value: links,
+                });
+              });
             });
             if (err) {
               vscode.window.showErrorMessage(err);

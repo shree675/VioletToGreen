@@ -41,10 +41,6 @@ export class SidebarLinksProvider implements vscode.WebviewViewProvider {
           vscode.window.showErrorMessage(data.value);
           break;
         }
-        case "request": {
-          this._view?.webview.postMessage({ type: "response", value: "hello" });
-          break;
-        }
         case "requestForConfigLinks": {
           var links;
 
@@ -68,6 +64,21 @@ export class SidebarLinksProvider implements vscode.WebviewViewProvider {
             }
           });
           break;
+        }
+        case "gotoLine": {
+          // check which file it is in
+          let editor = vscode.window.activeTextEditor;
+          let rangeStart = editor?.document.lineAt(
+            parseInt(data.value.startLine)
+          ).range;
+          let rangeEnd = editor?.document.lineAt(
+            parseInt(data.value.endLine)
+          ).range;
+          editor!.selection = new vscode.Selection(
+            rangeStart?.start!,
+            rangeEnd?.end!
+          );
+          editor?.revealRange(rangeStart!);
         }
       }
     });

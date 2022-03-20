@@ -79,11 +79,29 @@
       />
     </div>
     <div>
-      <div class="blue">
+      <div
+        class="blue"
+        on:click={() => {
+          // send file name as well
+          tsvscode.postMessage({
+            type: "gotoLine",
+            value: { startLine: item[0].startLine, endLine: item[0].endLine },
+          });
+        }}
+      >
         <span class="line-number">{formatLineNo(item[0])}</span>
         <i>{formatString(item[0])}</i>
       </div>
-      <div class="green">
+      <div
+        class="green"
+        on:click={() => {
+          // send file name as well
+          tsvscode.postMessage({
+            type: "gotoLine",
+            value: { startLine: item[1].startLine, endLine: item[1].endLine },
+          });
+        }}
+      >
         <span class="line-number">{formatLineNo(item[1])}</span>
         <i>{formatString(item[1])}</i>
       </div>
