@@ -73,9 +73,9 @@ export class SidebarLinksProvider implements vscode.WebviewViewProvider {
                 doc,
                 data.value.type === 1
                   ? {
-                      viewColumn: vscode.ViewColumn.Beside,
+                      viewColumn: vscode.ViewColumn.Two,
                     }
-                  : {}
+                  : { viewColumn: vscode.ViewColumn.One }
               )
               .then(() => {
                 let editor = vscode.window.activeTextEditor;
