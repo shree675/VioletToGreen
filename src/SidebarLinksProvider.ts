@@ -66,19 +66,32 @@ export class SidebarLinksProvider implements vscode.WebviewViewProvider {
           break;
         }
         case "gotoLine": {
-          // check which file it is in
-          let editor = vscode.window.activeTextEditor;
-          let rangeStart = editor?.document.lineAt(
-            parseInt(data.value.startLine)
-          ).range;
-          let rangeEnd = editor?.document.lineAt(
-            parseInt(data.value.endLine)
-          ).range;
-          editor!.selection = new vscode.Selection(
-            rangeStart?.start!,
-            rangeEnd?.end!
-          );
-          editor?.revealRange(rangeStart!);
+          var openFile = vscode.Uri.file(data.value.filepath);
+          vscode.workspace.openTextDocument(openFile).then((doc) => {
+            vscode.window
+              .showTextDocument(
+                doc,
+                data.value.type === 1
+                  ? {
+                      viewColumn: vscode.ViewColumn.Beside,
+                    }
+                  : {}
+              )
+              .then(() => {
+                let editor = vscode.window.activeTextEditor;
+                let rangeStart = editor?.document.lineAt(
+                  parseInt(data.value.startLine)
+                ).range;
+                let rangeEnd = editor?.document.lineAt(
+                  parseInt(data.value.endLine)
+                ).range;
+                editor!.selection = new vscode.Selection(
+                  rangeStart?.start!,
+                  rangeEnd?.end!
+                );
+                editor?.revealRange(rangeStart!);
+              });
+          });
         }
       }
     });

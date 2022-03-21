@@ -55,6 +55,7 @@ export class SidebarSelectionProvider implements vscode.WebviewViewProvider {
               endLine: editor?.selection.end.line,
               startCharacter: editor?.selection.start.character,
               endCharacter: editor?.selection.end.character,
+              filepath: vscode.window.activeTextEditor?.document.fileName,
             },
           });
           break;

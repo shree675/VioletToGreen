@@ -31,6 +31,7 @@
     endLine: string;
     startCharacter: string;
     endCharacter: string;
+    filepath: string;
   }) => {
     if (val.string.length >= 20) {
       return (
@@ -48,6 +49,7 @@
     endLine: string;
     startCharacter: string;
     endCharacter: string;
+    filepath: string;
   }) => {
     let str = "【" + (val.startLine + 1) + " - " + (val.endLine + 1) + "】";
     return str;
@@ -85,7 +87,12 @@
           // send file name as well
           tsvscode.postMessage({
             type: "gotoLine",
-            value: { startLine: item[0].startLine, endLine: item[0].endLine },
+            value: {
+              startLine: item[0].startLine,
+              endLine: item[0].endLine,
+              filepath: item[0].filepath,
+              type: 0,
+            },
           });
         }}
       >
@@ -98,7 +105,12 @@
           // send file name as well
           tsvscode.postMessage({
             type: "gotoLine",
-            value: { startLine: item[1].startLine, endLine: item[1].endLine },
+            value: {
+              startLine: item[1].startLine,
+              endLine: item[1].endLine,
+              filepath: item[1].filepath,
+              type: 1,
+            },
           });
         }}
       >
