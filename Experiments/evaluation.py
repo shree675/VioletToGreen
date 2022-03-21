@@ -9,7 +9,9 @@ Run the following command to compare two files:
 python3 evaluation.py --method single --code <path of code file> --label <path of annotated file> --prediction <path of predicted file>
 
 Example:
-python3 evaluation.py --method single --code ../Dataset/ToyData/CodeFiles/BubbleSort.java --label ../Dataset/ToyData/Annotations/BubbleSort.txt --prediction ./prediction_test1.txt
+python3 evaluation.py --method single --code ../Dataset/ToyData/CodeFiles/BubbleSort.java --label ../Dataset/ToyData/Annotations/BubbleSort.txt --prediction ../Dataset/ToyData/Predictions/BubbleSort.txt
+
+python3 evaluation.py --method single --code ../Dataset/ToyData/CodeFiles/Empty.java --label ../Dataset/ToyData/Annotations/Empty.txt --prediction ../Dataset/ToyData/Predictions/Empty.txt
 
 To evaluate the entire toy dataset, run the following command:
 python3 evaluation.py --method toy_set --verbose
@@ -64,15 +66,18 @@ def evaluate_single_file(code_file_name, label_file_name, prediction_file_name, 
     # print(predictions)
 
     # print('--------------------------------')
-    total_accuracy = 0
+    total_accuracy = 0.0
     comment_count = 0
+    flag_label = None
     for prediction in predictions:
         for label in labels:
             if prediction['comment_start_row'] == label['comment_start_row'] and prediction['comment_start_char'] == label['comment_start_char'] and prediction['comment_end_row'] == label['comment_end_row'] and prediction['comment_end_char'] == label['comment_end_char'] and prediction['code_start_row'] == label['code_start_row'] and prediction['code_end_char'] == label['code_end_char'] and prediction['code_end_row'] == label['code_end_row'] and prediction['code_end_char'] == label['code_end_char']:
                 # print("exact comment match found")
+                flag_label = label
                 break
             elif prediction['comment_start_row'] == label['comment_start_row'] and prediction['comment_start_char'] == label['comment_start_char']:
                 # print("comment match found")
+                flag_label = label
                 break
         
         row_number = prediction['code_start_row']
@@ -87,7 +92,7 @@ def evaluate_single_file(code_file_name, label_file_name, prediction_file_name, 
                 row_pred = row_pred[(prediction['code_start_char']-1):]
             # print(row_pred)
             prediction_length += len(row_pred)
-            if row_number >= label['code_start_row'] and row_number <= label['code_end_row']:
+            if flag_label is not None and row_number >= flag_label['code_start_row'] and row_number <= flag_label['code_end_row']:
                 row_label = code_lines[row_number - 1].rstrip()
                 if row_number == label['code_end_row']:
                     row_label = row_label[:(label['code_end_char']-1)]
@@ -101,11 +106,16 @@ def evaluate_single_file(code_file_name, label_file_name, prediction_file_name, 
         # print("Prediction Length: {}".format(prediction_length))
         # print("Label Length: {}".format(label_length))
         # print("Overlap Length: {}".format(overlap_length))
+        if label_length == 0:
+            print("Empty Label")
+            continue
         accuracy = float(overlap_length)/float(label_length)
         total_accuracy += accuracy
         if verbose == True:
             print("Accuracy: {0:.4f}".format(accuracy))
         comment_count += 1
+    if comment_count == 0:
+        return 1.0
     average_accuracy = total_accuracy/comment_count
     print('---------------------------------------------------------')
     print('File Name: {}'.format(code_file_name))
