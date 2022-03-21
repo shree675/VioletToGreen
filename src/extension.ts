@@ -63,6 +63,10 @@ export function activate(context: vscode.ExtensionContext) {
     )
   );
 
+  vscode.commands.executeCommand(
+    "workbench.view.extension.violet-to-green-sidebar-view"
+  );
+
   context.subscriptions.push(
     vscode.commands.registerCommand("violet-to-green.helloWorld", () => {
       vscode.window.showInformationMessage("Hello World from VioletToGreen!");

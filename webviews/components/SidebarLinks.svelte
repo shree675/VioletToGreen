@@ -90,6 +90,8 @@
             value: {
               startLine: item[0].startLine,
               endLine: item[0].endLine,
+              startCharacter: item[0].startCharacter,
+              endCharacter: item[0].endCharacter,
               filepath: item[0].filepath,
               type: 0,
             },
@@ -108,6 +110,8 @@
             value: {
               startLine: item[1].startLine,
               endLine: item[1].endLine,
+              startCharacter: item[1].startCharacter,
+              endCharacter: item[1].endCharacter,
               filepath: item[1].filepath,
               type: 1,
             },
