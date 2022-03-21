@@ -13,7 +13,6 @@ export class SidebarLinksProvider implements vscode.WebviewViewProvider {
     this._view = webviewView;
 
     webviewView.webview.options = {
-      // Allow scripts in the webview
       enableScripts: true,
       localResourceRoots: [this._extensionUri],
     };
@@ -24,6 +23,73 @@ export class SidebarLinksProvider implements vscode.WebviewViewProvider {
       vscode.workspace?.workspaceFolders![0].uri.fsPath,
       "violettogreen.config.json"
     );
+
+    const decorate = (selection: any, decorationType: any, editor: any) => {
+      const range = new vscode.Range(
+        selection.startLine,
+        selection.startCharacter,
+        selection.endLine,
+        selection.endCharacter
+      );
+      editor.setDecorations(decorationType, [range]);
+    };
+
+    var decorationType: any = [];
+
+    function createDecoration(type: Number) {
+      decorationType.push(
+        vscode.window.createTextEditorDecorationType({
+          backgroundColor:
+            type === 0 ? "rgba(0, 0, 255, 0.2)" : "rgba(0, 255, 0, 0.2)",
+          isWholeLine: false,
+          rangeBehavior: vscode.DecorationRangeBehavior.ClosedClosed,
+        })
+      );
+    }
+
+    var arrayRange: any = [];
+
+    vscode.window.onDidChangeTextEditorSelection((e) => {
+      var cursor = vscode.window.activeTextEditor?.selection.active;
+      while (decorationType.length > 0) {
+        decorationType[decorationType.length - 1].dispose();
+        decorationType.pop();
+      }
+      arrayRange.forEach((range: any) => {
+        if (
+          (cursor?.line! > range[0].startLine &&
+            cursor?.line! < range[0].endLine) ||
+          (cursor?.line! > range[1].startLine &&
+            cursor?.line! < range[1].endLine) ||
+          (cursor?.line! === range[0].startLine &&
+            cursor?.character! >= range[0].startCharacter) ||
+          (cursor?.line! === range[0].endLine &&
+            cursor?.character! <= range[0].endCharacter) ||
+          (cursor?.line! === range[1].startLine &&
+            cursor?.character! >= range[1].startCharacter) ||
+          (cursor?.line! === range[1].endLine &&
+            cursor?.character! <= range[1].endCharacter)
+        ) {
+          const filepath = vscode.window.activeTextEditor?.document.fileName;
+          if (filepath === range[0].filepath) {
+            createDecoration(0);
+            decorate(
+              range[0],
+              decorationType[decorationType.length - 1],
+              vscode.window.activeTextEditor
+            );
+          }
+          if (filepath === range[1].filepath) {
+            createDecoration(1);
+            decorate(
+              range[1],
+              decorationType[decorationType.length - 1],
+              vscode.window.activeTextEditor
+            );
+          }
+        }
+      });
+    });
 
     webviewView.webview.onDidReceiveMessage((data: any) => {
       switch (data.type) {
@@ -49,6 +115,7 @@ export class SidebarLinksProvider implements vscode.WebviewViewProvider {
             if (err) {
               vscode.window.showErrorMessage(err);
             }
+            arrayRange = links;
             this._view?.webview.postMessage({
               type: "configLinks",
               value: links,
@@ -72,9 +139,7 @@ export class SidebarLinksProvider implements vscode.WebviewViewProvider {
               .showTextDocument(
                 doc,
                 data.value.type === 1
-                  ? {
-                      viewColumn: vscode.ViewColumn.Two,
-                    }
+                  ? { viewColumn: vscode.ViewColumn.Two }
                   : { viewColumn: vscode.ViewColumn.One }
               )
               .then(() => {
@@ -82,13 +147,15 @@ export class SidebarLinksProvider implements vscode.WebviewViewProvider {
                 let rangeStart = editor?.document.lineAt(
                   parseInt(data.value.startLine)
                 ).range;
-                let rangeEnd = editor?.document.lineAt(
-                  parseInt(data.value.endLine)
-                ).range;
-                editor!.selection = new vscode.Selection(
-                  rangeStart?.start!,
-                  rangeEnd?.end!
+                const pos1 = new vscode.Position(
+                  data.value.startLine,
+                  data.value.startCharacter
                 );
+                const pos2 = new vscode.Position(
+                  data.value.endLine,
+                  data.value.endCharacter
+                );
+                editor!.selection = new vscode.Selection(pos1, pos2);
                 editor?.revealRange(rangeStart!);
               });
           });
