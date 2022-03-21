@@ -1,0 +1,9 @@
+19,9,19,35,20,9,22,10 ``
+31,21,31,65,32,21,34,22 `find min`
+44,9,44,82,45,9,46,36 `the next 2 lines after the comment`
+24,9,24,42,25,9,37,10 `small comment for a very big block`
+15,33,15,62,15,13,15,32 `inline comment after the code `
+16,33,16,59,16,13,16,32 `inline comment`
+8,5,8,43,9,5,40,6 `small function description`
+3,1,5,4,6,1,48,2 `class following just after a comment`
+1,1,1,49,1,1,1,49 `since it is commented code, we link link it to itself?`
