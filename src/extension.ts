@@ -17,7 +17,7 @@ const createFile = () => {
   );
   fs.open(filepath, "r", (fileNotExists: Boolean, file: any) => {
     if (fileNotExists) {
-      fs.writeFile(filepath, JSON.stringify({}), (err: any) => {
+      fs.writeFile(filepath, JSON.stringify([]), (err: any) => {
         if (err) {
           vscode.window.showErrorMessage(err);
           return false;
