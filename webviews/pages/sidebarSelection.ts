@@ -1,4 +1,5 @@
-import App from "../components/Sidebar.svelte";
+//@ts-ignore
+import App from "../components/SidebarSelection.svelte";
 
 const app = new App({
   target: document.body,

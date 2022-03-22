@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import { getNonce } from "./getNonce";
 
-export class SidebarProvider implements vscode.WebviewViewProvider {
+export class SidebarReadabilityProvider implements vscode.WebviewViewProvider {
   _view?: vscode.WebviewView;
   _doc?: vscode.TextDocument;
 
@@ -11,7 +11,6 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
     this._view = webviewView;
 
     webviewView.webview.options = {
-      // Allow scripts in the webview
       enableScripts: true,
       localResourceRoots: [this._extensionUri],
     };
@@ -37,10 +36,6 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
         case "request": {
           const editor = vscode.window.activeTextEditor;
           const selectionString = editor?.document.getText(editor.selection);
-          this._view?.webview.postMessage({
-            type: "response",
-            value: selectionString,
-          });
           break;
         }
       }
@@ -60,10 +55,18 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
     );
 
     const scriptUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this._extensionUri, "out", "compiled/sidebar.js")
+      vscode.Uri.joinPath(
+        this._extensionUri,
+        "out",
+        "compiled/sidebarReadability.js"
+      )
     );
     const styleMainUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this._extensionUri, "out", "compiled/sidebar.css")
+      vscode.Uri.joinPath(
+        this._extensionUri,
+        "out",
+        "compiled/sidebarReadability.css"
+      )
     );
 
     // Use a nonce to only allow a specific script to be run.
