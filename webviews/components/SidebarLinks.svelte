@@ -51,17 +51,24 @@
     endCharacter: string;
     filepath: string;
   }) => {
-    let str = "【" + (val.startLine + 1) + " - " + (val.endLine + 1) + "】";
+    let str = "【" + val.startLine + " - " + val.endLine + "】";
     return str;
   };
 
   onMount(() => {
     window.addEventListener("message", (event) => {
       const message = event.data;
-      if (message.type === "requestForLinks") {
-        console.log("value:", message.value);
-      } else if (message.type === "configLinks") {
+      if (message.type === "configLinks") {
         links = message.value;
+        tsvscode.postMessage({
+          type: "updateArrayRange",
+          value: links,
+        });
+      } else if (message.type === "saveLinks") {
+        tsvscode.postMessage({
+          type: "saveLinks",
+          value: "",
+        });
       }
     });
   });
@@ -84,7 +91,6 @@
       <div
         class="blue"
         on:click={() => {
-          // send file name as well
           tsvscode.postMessage({
             type: "gotoLine",
             value: {
@@ -104,7 +110,6 @@
       <div
         class="green"
         on:click={() => {
-          // send file name as well
           tsvscode.postMessage({
             type: "gotoLine",
             value: {

@@ -46,6 +46,12 @@ export class SidebarSelectionProvider implements vscode.WebviewViewProvider {
         }
         case "requestSelection": {
           const editor = vscode.window.activeTextEditor;
+          // const pos1 = new vscode.Position(0, 2);
+          // const pos2 = new vscode.Position(4, 2);
+          // const selection = editor?.document.getText(
+          //   new vscode.Selection(pos1, pos2)
+          // );
+          // console.log("abc", selection);
           const selectionString = editor?.document.getText(editor.selection);
           this._view?.webview.postMessage({
             type: "responseSelection",
@@ -61,7 +67,6 @@ export class SidebarSelectionProvider implements vscode.WebviewViewProvider {
           break;
         }
         case "requestForLinks": {
-          console.log("requestForLinks");
           this._sidebarLinksProvider._view?.webview.postMessage({
             type: "requestForLinks",
             value: "requestForLinks",
@@ -69,32 +74,42 @@ export class SidebarSelectionProvider implements vscode.WebviewViewProvider {
           break;
         }
         case "addLink": {
-          fs.readFile(filepath, (err: any, fileData: any) => {
-            var links = JSON.parse(fileData);
-            links = [data.value, ...links];
-            fs.writeFile(filepath, JSON.stringify(links), (err: any) => {
-              if (err) {
-                vscode.window.showErrorMessage(err);
-                return;
-              }
-              var links;
-
-              fs.readFile(filepath, (err: any, fileData: any) => {
-                links = JSON.parse(fileData);
+          this._sidebarLinksProvider._view?.webview.postMessage({
+            type: "saveLinks",
+            value: "Save the links",
+          });
+          setTimeout(() => {
+            fs.readFile(filepath, (err: any, fileData: any) => {
+              var links = JSON.parse(fileData);
+              links = [data.value, ...links];
+              fs.writeFile(filepath, JSON.stringify(links), (err: any) => {
                 if (err) {
                   vscode.window.showErrorMessage(err);
                   return;
                 }
+                // var links;
+
+                // fs.readFile(filepath, (err: any, fileData: any) => {
+                //   links = JSON.parse(fileData);
+                //   if (err) {
+                //     vscode.window.showErrorMessage(err);
+                //     return;
+                //   }
+                //   this._sidebarLinksProvider._view?.webview.postMessage({
+                //     type: "configLinks",
+                //     value: links,
+                //   });
+                // });
                 this._sidebarLinksProvider._view?.webview.postMessage({
                   type: "configLinks",
                   value: links,
                 });
               });
+              if (err) {
+                vscode.window.showErrorMessage(err);
+              }
             });
-            if (err) {
-              vscode.window.showErrorMessage(err);
-            }
-          });
+          }, 1000);
           break;
         }
       }
