@@ -26,9 +26,9 @@ export class SidebarLinksProvider implements vscode.WebviewViewProvider {
 
     const decorate = (selection: any, decorationType: any, editor: any) => {
       const range = new vscode.Range(
-        selection.startLine,
+        selection.startLine - 1,
         selection.startCharacter,
-        selection.endLine,
+        selection.endLine - 1,
         selection.endCharacter
       );
       editor.setDecorations(decorationType, [range]);
@@ -51,23 +51,25 @@ export class SidebarLinksProvider implements vscode.WebviewViewProvider {
 
     vscode.window.onDidChangeTextEditorSelection((e) => {
       var cursor = vscode.window.activeTextEditor?.selection.active;
+      console.log(cursor);
+      console.log(arrayRange);
       while (decorationType.length > 0) {
         decorationType[decorationType.length - 1].dispose();
         decorationType.pop();
       }
       arrayRange.forEach((range: any) => {
         if (
-          (cursor?.line! > range[0].startLine &&
-            cursor?.line! < range[0].endLine) ||
-          (cursor?.line! > range[1].startLine &&
-            cursor?.line! < range[1].endLine) ||
-          (cursor?.line! === range[0].startLine &&
+          (cursor?.line! + 1 > range[0].startLine &&
+            cursor?.line! + 1 < range[0].endLine) ||
+          (cursor?.line! + 1 > range[1].startLine &&
+            cursor?.line! + 1 < range[1].endLine) ||
+          (cursor?.line! + 1 === range[0].startLine &&
             cursor?.character! >= range[0].startCharacter) ||
-          (cursor?.line! === range[0].endLine &&
+          (cursor?.line! + 1 === range[0].endLine &&
             cursor?.character! <= range[0].endCharacter) ||
-          (cursor?.line! === range[1].startLine &&
+          (cursor?.line! + 1 === range[1].startLine &&
             cursor?.character! >= range[1].startCharacter) ||
-          (cursor?.line! === range[1].endLine &&
+          (cursor?.line! + 1 === range[1].endLine &&
             cursor?.character! <= range[1].endCharacter)
         ) {
           const filepath = vscode.window.activeTextEditor?.document.fileName;
@@ -89,6 +91,118 @@ export class SidebarLinksProvider implements vscode.WebviewViewProvider {
           }
         }
       });
+    });
+
+    vscode.workspace.onDidSaveTextDocument((e: vscode.TextDocument) => {
+      const file = vscode.window.activeTextEditor?.document.fileName;
+      for (var i = 0; i < arrayRange.length; i++) {
+        if (
+          path.resolve(arrayRange[i][0].filepath) === path.resolve(file) ||
+          path.resolve(arrayRange[i][1].filepath) === path.resolve(file)
+        ) {
+          const editor = vscode.window.activeTextEditor;
+          for (var i = 0; i < arrayRange.length; i++) {
+            for (var j = 0; j < arrayRange[i].length; j++) {
+              if (
+                path.resolve(arrayRange[i][j].filepath) === path.resolve(file)
+              ) {
+                const pos1 = new vscode.Position(
+                  arrayRange[i][j].startLine - 1,
+                  arrayRange[i][j].startCharacter
+                );
+                const pos2 = new vscode.Position(
+                  arrayRange[i][j].endLine - 1,
+                  arrayRange[i][j].endCharacter
+                );
+                const selectionString = editor?.document.getText(
+                  new vscode.Selection(pos1, pos2)
+                );
+                console.log("aaaaaa", selectionString);
+                arrayRange[i][j].string = selectionString;
+              }
+            }
+          }
+          fs.writeFile(filepath, JSON.stringify(arrayRange), (err: any) => {
+            if (err) {
+              vscode.window.showErrorMessage(err);
+              return;
+            }
+            this._view?.webview.postMessage({
+              type: "configLinks",
+              value: arrayRange,
+            });
+          });
+          return;
+        }
+      }
+    });
+
+    vscode.workspace.onDidChangeTextDocument((event) => {
+      var cursor = vscode.window.activeTextEditor?.selection.active;
+      const filepath = vscode.window.activeTextEditor?.document.fileName;
+      if (event.contentChanges[0].text.match(/\n/g) !== null) {
+        for (var i = 0; i < arrayRange.length; i++) {
+          if (
+            cursor?.line! + 1 < arrayRange[i][1].startLine &&
+            path.resolve(arrayRange[i][1].filepath) === path.resolve(filepath)
+          ) {
+            arrayRange[i][1].startLine += 1;
+            arrayRange[i][1].endLine += 1;
+          } else if (
+            cursor?.line! + 1 >= arrayRange[i][1].startLine &&
+            cursor?.line! + 1 <= arrayRange[i][1].endLine &&
+            path.resolve(arrayRange[i][1].filepath) === path.resolve(filepath)
+          ) {
+            arrayRange[i][1].endLine += 1;
+          }
+          if (
+            cursor?.line! + 1 < arrayRange[i][0].startLine &&
+            path.resolve(arrayRange[i][0].filepath) === path.resolve(filepath)
+          ) {
+            arrayRange[i][0].startLine += 1;
+            arrayRange[i][0].endLine += 1;
+          } else if (
+            cursor?.line! + 1 >= arrayRange[i][0].startLine &&
+            cursor?.line! + 1 <= arrayRange[i][0].endLine &&
+            path.resolve(arrayRange[i][0].filepath) === path.resolve(filepath)
+          ) {
+            arrayRange[i][0].endLine += 1;
+          }
+        }
+      } else if (
+        event.contentChanges[0].text === "" &&
+        event.contentChanges[0].range.end.line ===
+          event.contentChanges[0].range.start.line + 1
+      ) {
+        for (var i = 0; i < arrayRange.length; i++) {
+          if (
+            cursor?.line! + 1 < arrayRange[i][1].startLine &&
+            path.resolve(arrayRange[i][1].filepath) === path.resolve(filepath)
+          ) {
+            arrayRange[i][1].startLine -= 1;
+            arrayRange[i][1].endLine -= 1;
+          } else if (
+            cursor?.line! + 1 >= arrayRange[i][1].startLine &&
+            cursor?.line! + 1 <= arrayRange[i][1].endLine &&
+            path.resolve(arrayRange[i][1].filepath) === path.resolve(filepath)
+          ) {
+            arrayRange[i][1].endLine -= 1;
+          }
+          if (
+            cursor?.line! + 1 < arrayRange[i][0].startLine &&
+            path.resolve(arrayRange[i][0].filepath) === path.resolve(filepath)
+          ) {
+            arrayRange[i][0].startLine -= 1;
+            arrayRange[i][0].endLine -= 1;
+          } else if (
+            cursor?.line! + 1 >= arrayRange[i][0].startLine &&
+            cursor?.line! + 1 <= arrayRange[i][0].endLine &&
+            path.resolve(arrayRange[i][0].filepath) === path.resolve(filepath)
+          ) {
+            arrayRange[i][0].endLine -= 1;
+          }
+        }
+      }
     });
 
     webviewView.webview.onDidReceiveMessage((data: any) => {
@@ -124,12 +238,17 @@ export class SidebarLinksProvider implements vscode.WebviewViewProvider {
           break;
         }
         case "updateConfigLinks": {
+          arrayRange = data.value;
           fs.writeFile(filepath, JSON.stringify(data.value), (err: any) => {
             if (err) {
               vscode.window.showErrorMessage(err);
               return false;
             }
           });
+          break;
+        }
+        case "updateArrayRange": {
+          arrayRange = data.value;
           break;
         }
         case "gotoLine": {
@@ -159,6 +278,39 @@ export class SidebarLinksProvider implements vscode.WebviewViewProvider {
                 editor?.revealRange(rangeStart!);
               });
           });
+          break;
+        }
+        case "saveLinks": {
+          const editor = vscode.window.activeTextEditor;
+          const file = editor?.document.fileName;
+          for (var i = 0; i < arrayRange.length; i++) {
+            for (var j = 0; j < arrayRange[i].length; j++) {
+              if (
+                path.resolve(arrayRange[i][j].filepath) === path.resolve(file)
+              ) {
+                const pos1 = new vscode.Position(
+                  arrayRange[i][j].startLine,
+                  arrayRange[i][j].startCharacter
+                );
+                const pos2 = new vscode.Position(
+                  arrayRange[i][j].endLine,
+                  arrayRange[i][j].endCharacter
+                );
+                const selectionString = editor?.document.getText(
+                  new vscode.Selection(pos1, pos2)
+                );
+                console.log("aaaaaa", selectionString);
+                arrayRange[i][j].string = selectionString;
+              }
+            }
+          }
+          fs.writeFile(filepath, JSON.stringify(arrayRange), (err: any) => {
+            if (err) {
+              vscode.window.showErrorMessage(err);
+              return;
+            }
+          });
+          break;
         }
       }
     });
