@@ -28,56 +28,68 @@ const createFile = () => {
   return true;
 };
 
-// function updateDiagnostics(
-//   document: vscode.TextDocument,
-//   collection: vscode.DiagnosticCollection
-// ): void {
-//   if (document && path.basename(document.uri.fsPath) === "sample-demo.rs") {
-//     collection.set(document.uri, [
-//       {
-//         code: "",
-//         message: "cannot assign twice to immutable variable `x`",
-//         range: new vscode.Range(
-//           new vscode.Position(3, 4),
-//           new vscode.Position(3, 10)
-//         ),
-//         severity: vscode.DiagnosticSeverity.Error,
-//         source: "",
-//         relatedInformation: [
-//           new vscode.DiagnosticRelatedInformation(
-//             new vscode.Location(
-//               document.uri,
-//               new vscode.Range(
-//                 new vscode.Position(1, 8),
-//                 new vscode.Position(1, 9)
-//               )
-//             ),
-//             "first assignment to `x`"
-//           ),
-//         ],
-//       },
-//     ]);
-//   } else {
-//     collection.clear();
-//   }
-// }
+function updateDiagnostics(
+  document: vscode.TextDocument,
+  collection: vscode.DiagnosticCollection
+): void {
+  if (document) {
+    collection.set(document.uri, [
+      {
+        code: "",
+        message: "This is a test for displaying diagnostic messages",
+        range: new vscode.Range(
+          new vscode.Position(3, 4),
+          new vscode.Position(3, 10)
+        ),
+        severity: vscode.DiagnosticSeverity.Information,
+        source: "",
+        relatedInformation: [
+          new vscode.DiagnosticRelatedInformation(
+            new vscode.Location(
+              document.uri,
+              new vscode.Range(
+                new vscode.Position(1, 8),
+                new vscode.Position(1, 9)
+              )
+            ),
+            "Additional information about the diagnostic"
+          ),
+        ],
+      },
+    ]);
+  } else {
+    collection.clear();
+  }
+}
 
 export function activate(context: vscode.ExtensionContext) {
   if (!createFile()) {
     return;
   }
 
-  // const collection = vscode.languages.createDiagnosticCollection("test");
-  // if (vscode.window.activeTextEditor) {
-  //   updateDiagnostics(vscode.window.activeTextEditor.document, collection);
-  // }
-  // context.subscriptions.push(
-  //   vscode.window.onDidChangeActiveTextEditor((editor) => {
-  //     if (editor) {
-  //       updateDiagnostics(editor.document, collection);
-  //     }
-  //   })
-  // );
+  // gutter not working:
+
+  // const decoration = vscode.window.createTextEditorDecorationType({
+  //   gutterIconPath: "../media/checklist.svg",
+  // });
+
+  // const editor = vscode.window.activeTextEditor;
+
+  // editor?.setDecorations(decoration, [
+  //   new vscode.Range(new vscode.Position(1, 1), new vscode.Position(1, 2)),
+  // ]);
+
+  const collection = vscode.languages.createDiagnosticCollection("test");
+  if (vscode.window.activeTextEditor) {
+    updateDiagnostics(vscode.window.activeTextEditor.document, collection);
+  }
+  context.subscriptions.push(
+    vscode.window.onDidChangeActiveTextEditor((editor) => {
+      if (editor) {
+        updateDiagnostics(editor.document, collection);
+      }
+    })
+  );
 
   const sidebarLinksProvider = new SidebarLinksProvider(context.extensionUri);
   const sidebarSelectionProvider = new SidebarSelectionProvider(
