@@ -84,23 +84,43 @@ def evaluate_single_file(code_file_name, label_file_name, prediction_file_name, 
         prediction_length = 0
         label_length = 0
         overlap_length = 0
+        false_length = 0
+        total_length = 0
+        
         while row_number <= prediction['code_end_row']:
             row_pred = code_lines[row_number - 1].rstrip()
+            pred_start = 1
+            pred_end = len(row_pred)
             if row_number == prediction['code_end_row']:
                 row_pred = row_pred[:(prediction['code_end_char']-1)]
+                pred_end = prediction['code_end_char']
             if row_number == prediction['code_start_row']:
                 row_pred = row_pred[(prediction['code_start_char']-1):]
+                pred_start = prediction['code_start_char']
             # print(row_pred)
             prediction_length += len(row_pred)
             if flag_label is not None and row_number >= flag_label['code_start_row'] and row_number <= flag_label['code_end_row']:
                 row_label = code_lines[row_number - 1].rstrip()
+                label_start = 1
+                label_end = len(row_label)
                 if row_number == label['code_end_row']:
                     row_label = row_label[:(label['code_end_char']-1)]
+                    label_end = label['code_end_char']
                 if row_number == label['code_start_row']:
                     row_label = row_label[(label['code_start_char']-1):]
+                    label_start = label['code_start_char']
                 label_length += len(row_label)
                 # print(row_label)
-                overlap_length += min(len(row_pred), len(row_label))
+                overlap = min(pred_end, label_end) - max(pred_start, label_start)
+                if overlap < 0:
+                    overlap = 0
+                #print('overlap', overlap)
+                total = max(pred_end, label_end) - min(pred_start, label_start)
+                #print('total', total)
+                # print('false', max(pred_end, label_end) - min(pred_end, label_end) + max(pred_start, label_start) - min(pred_start, label_start))
+                overlap_length += overlap
+                # false_length += max(pred_end, label_end) - min(pred_end, label_end) + max(pred_start, label_start) - min(pred_start, label_start)
+                total_length += total
 
             row_number += 1
         # print("Prediction Length: {}".format(prediction_length))
@@ -109,12 +129,17 @@ def evaluate_single_file(code_file_name, label_file_name, prediction_file_name, 
         if label_length == 0:
             print("Empty Label")
             continue
-        accuracy = float(overlap_length)/float(label_length)
+        #print('Totoal overlap length: {}'.format(overlap_length))
+        #print('Total false length: {}'.format(false_length))
+        #print('Total length: {}'.format(total_length))
+        accuracy = float(overlap_length)/float(total_length)
         total_accuracy += accuracy
         if verbose == True:
             print("Accuracy: {0:.4f}".format(accuracy))
         comment_count += 1
-    if comment_count == 0:
+    if comment_count == 0: 
+        # if no comments were found in the file, return accuracy 1 and prevent Division by Zero Error
+        #print("returns accuracy 1 for empty")
         return 1.0
     average_accuracy = total_accuracy/comment_count
     print('---------------------------------------------------------')
