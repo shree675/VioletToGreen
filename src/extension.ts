@@ -69,15 +69,19 @@ export function activate(context: vscode.ExtensionContext) {
 
   // gutter not working:
 
-  // const decoration = vscode.window.createTextEditorDecorationType({
-  //   gutterIconPath: "../media/checklist.svg",
-  // });
+  const decoration = vscode.window.createTextEditorDecorationType({
+    gutterIconPath: vscode.Uri.joinPath(
+      context.extensionUri,
+      "media",
+      "checklist.svg"
+    ).path,
+  });
 
-  // const editor = vscode.window.activeTextEditor;
+  const editor = vscode.window.activeTextEditor;
 
-  // editor?.setDecorations(decoration, [
-  //   new vscode.Range(new vscode.Position(1, 1), new vscode.Position(1, 2)),
-  // ]);
+  editor?.setDecorations(decoration, [
+    new vscode.Range(new vscode.Position(1, 1), new vscode.Position(2, 4)),
+  ]);
 
   const collection = vscode.languages.createDiagnosticCollection("test");
   if (vscode.window.activeTextEditor) {
