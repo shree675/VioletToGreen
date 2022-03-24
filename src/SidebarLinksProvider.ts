@@ -299,7 +299,6 @@ export class SidebarLinksProvider implements vscode.WebviewViewProvider {
                 const selectionString = editor?.document.getText(
                   new vscode.Selection(pos1, pos2)
                 );
-                console.log("aaaaaa", selectionString);
                 arrayRange[i][j].string = selectionString;
               }
             }
