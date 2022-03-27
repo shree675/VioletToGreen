@@ -20,16 +20,20 @@ export function linkComments(editor?: vscode.TextEditor) {
     lineNumber: Number;
     comment: string;
     type: CommentType;
+    // startCharacter: Number;
+    // startLine: Number;
+    // endCharacter: Number;
+    // endLine: Number;
   }> = [];
 
-//   const matches = text.matchAll(multilineComment);
-//   for (const match in matches) {
-//     comments.push({
-//         comment: match[0],
-//         lineNumber: 0,
-//         type: CommentType.multiline,
-//     });
-//   }
+  const matches = text.matchAll(multilineComment);
+  for (const match in matches) {
+    comments.push({
+        comment: match[0],
+        lineNumber: 0,
+        type: CommentType.multiline,
+    });
+  }
 
     for (const line of lines) {
       //   check if the comment is a single line comment
