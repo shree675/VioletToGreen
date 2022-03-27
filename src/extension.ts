@@ -4,6 +4,7 @@ const path = require("path");
 import { SidebarSelectionProvider } from "./SidebarSelectionProvider";
 import { SidebarReadabilityProvider } from "./SidebarReadabilityProvider";
 import { SidebarLinksProvider } from "./SidebarLinksProvider";
+import { linkComments } from "./parser";
 
 const createFile = () => {
   var workspace = vscode.workspace?.workspaceFolders;
@@ -143,6 +144,10 @@ export function activate(context: vscode.ExtensionContext) {
       );
     })
   );
+
+  vscode.commands.registerCommand("violet-to-green.linkAutomatically", () => {
+    linkComments(vscode.window.activeTextEditor);
+  });
 }
 
 export function deactivate() {}

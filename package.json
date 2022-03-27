@@ -12,6 +12,7 @@
   "activationEvents": [
     "onStartupFinished",
     "onCommand:violet-to-green.helloWorld",
+    "onCommand:violet-to-green.linkAutomatically",
     "onCommand:violet-to-green.refresh",
     "onView:violet-to-green-sidebar"
   ],
@@ -60,6 +61,11 @@
         "command": "violet-to-green.refresh",
         "category": "VioletToGreen",
         "title": "Refresh"
+      },
+      {
+        "command": "violet-to-green.linkAutomatically",
+        "category": "VioletToGreen",
+        "title": "Link Automatically"
       }
     ]
   },
