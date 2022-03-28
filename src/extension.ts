@@ -5,6 +5,7 @@ import { SidebarSelectionProvider } from "./SidebarSelectionProvider";
 import { SidebarReadabilityProvider } from "./SidebarReadabilityProvider";
 import { SidebarLinksProvider } from "./SidebarLinksProvider";
 import { linkComments } from "./parser";
+import { Metrics } from "./readabilityMetrics";
 
 const createFile = () => {
   var workspace = vscode.workspace?.workspaceFolders;
@@ -68,7 +69,8 @@ export function activate(context: vscode.ExtensionContext) {
     return;
   }
 
-  // gutter not working:
+  const metrics = new Metrics();
+  metrics.getBlocks();
 
   const decoration = vscode.window.createTextEditorDecorationType({
     gutterIconPath: vscode.Uri.joinPath(
