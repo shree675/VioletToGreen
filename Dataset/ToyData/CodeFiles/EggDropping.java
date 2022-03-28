@@ -31,9 +31,33 @@ public class EggDropping {
                     // choose min of all values for particular x
                     if (result < eggFloor[i][j]) {
                         eggFloor[i][j] = result;
+                    } else if (a == b) {
+                        System.out.println("a==b");
+                    } else {
+                        System.out.println("a!=b");
                     }
                 }
             }
+        }
+
+        switch (x) {
+            case 0:
+                System.out.println("0");
+                break;
+            case 1:
+                System.out.println("1");
+                break;
+            default:
+                System.out.println(x);
+                break;
+        }
+
+        do {
+            System.out.println("x");
+        } while (x == 0);
+
+        while (true) {
+            System.out.println("");
         }
 
         return eggFloor[n][m];

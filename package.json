@@ -110,6 +110,7 @@
   },
   "dependencies": {
     "@rollup/plugin-json": "^4.1.0",
+    "java-parser": "^2.0.1",
     "polka": "^0.5.2"
   }
 }
