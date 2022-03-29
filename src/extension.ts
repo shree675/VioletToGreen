@@ -69,9 +69,6 @@ export function activate(context: vscode.ExtensionContext) {
     return;
   }
 
-  const metrics = new Metrics();
-  metrics.getBlocks();
-
   const decoration = vscode.window.createTextEditorDecorationType({
     gutterIconPath: vscode.Uri.joinPath(
       context.extensionUri,
@@ -148,7 +145,215 @@ export function activate(context: vscode.ExtensionContext) {
   );
 
   vscode.commands.registerCommand("violet-to-green.linkAutomatically", () => {
-    linkComments(vscode.window.activeTextEditor);
+    const parser = linkComments(vscode.window.activeTextEditor);
+    const metrics = new Metrics();
+    const editor = vscode.window.activeTextEditor;
+    var links = [];
+
+    const convertToObject = (value: any) => {
+      return {
+        startLine: value.startLine,
+        startCharacter: value.startCharacter
+          ? value.startCharacter
+          : value.startColumn,
+        endLine: value.endLine,
+        endCharacter: value.endCharacter ? value.endCharacter : value.endColumn,
+      };
+    };
+
+    metrics.getBlocks();
+
+    findLinks: for (const comment of parser?.comments!) {
+      // if it is a multiline comment
+      if (comment.type === parser?.enums.multiline) {
+        var nextNonEmpty = -1;
+        for (var i = comment.endLine; i < parser.lines.length; i++) {
+          if (parser.lines[i].length > 0) {
+            nextNonEmpty = i + 1;
+            break;
+          }
+        }
+        const pos1 = new vscode.Position(
+          comment.startLine - 1,
+          comment.startCharacter
+        );
+        const pos2 = new vscode.Position(
+          comment.endLine - 1,
+          comment.endCharacter
+        );
+        const commentText = editor?.document
+          .getText(new vscode.Selection(pos1, pos2))
+          .toLocaleLowerCase();
+
+        if (nextNonEmpty !== -1) {
+          // if next line is a class declaration
+          for (var i = 0; i < metrics.classes.length; i++) {
+            if (metrics.classes[i].startLine === nextNonEmpty) {
+              links.push([
+                convertToObject(comment),
+                convertToObject(metrics.classes[i]),
+              ]);
+              continue findLinks;
+            }
+          }
+
+          // if next line is an interface declaration
+          for (var i = 0; i < metrics.interfaces.length; i++) {
+            if (metrics.interfaces[i].startLine === nextNonEmpty) {
+              links.push([
+                convertToObject(comment),
+                convertToObject(metrics.interfaces[i]),
+              ]);
+              continue findLinks;
+            }
+          }
+
+          // if the class declaration is somewhere else
+          if (
+            commentText?.includes("class") ||
+            commentText?.includes("@author") ||
+            commentText?.includes("program")
+          ) {
+            // find and link the nearest class declaration
+            for (var i = 0; i < metrics.classes.length; i++) {
+              if (metrics.classes[i].startLine > comment.startLine) {
+                links.push([
+                  convertToObject(comment),
+                  convertToObject(metrics.classes[i]),
+                ]);
+                continue findLinks;
+              }
+            }
+          }
+
+          // if the interface declaration is somewhere else
+          if (
+            commentText?.includes("interface") ||
+            commentText?.includes("@author")
+          ) {
+            // find and link the nearest interface declaration
+            for (var i = 0; i < metrics.interfaces.length; i++) {
+              if (metrics.interfaces[i].startLine > comment.startLine) {
+                links.push([
+                  convertToObject(comment),
+                  convertToObject(metrics.interfaces[i]),
+                ]);
+                continue findLinks;
+              }
+            }
+          }
+
+          // if next line is function declaration
+          if (
+            !commentText?.includes("above") &&
+            (commentText?.includes("@param") ||
+              commentText?.includes("@return") ||
+              commentText?.includes("function") ||
+              commentText?.includes("method") ||
+              commentText?.includes("routine") ||
+              commentText?.includes("routine") ||
+              commentText?.includes("subroutine") ||
+              commentText?.includes("subroutines") ||
+              commentText?.includes("returns") ||
+              commentText?.includes("@throws") ||
+              commentText?.includes("@exception") ||
+              commentText?.includes("driver") ||
+              commentText?.includes("constructor") ||
+              commentText?.includes("destructor") ||
+              commentText?.includes("recurse") ||
+              commentText?.includes("recursive") ||
+              commentText?.includes("recursion"))
+          ) {
+            for (var i = 0; i < metrics.methods.length; i++) {
+              if (metrics.methods[i].startLine === nextNonEmpty) {
+                links.push([
+                  convertToObject(comment),
+                  convertToObject(metrics.methods[i]),
+                ]);
+                continue findLinks;
+              }
+            }
+          }
+
+          // if next line is @Override or @Deprecated, then its next line is a function
+          if (
+            parser.lines[nextNonEmpty].trim() === "@Override" ||
+            parser.lines[nextNonEmpty].trim() === "@Deprecated"
+          ) {
+            var tempNextLine = nextNonEmpty + 1;
+            for (var i = nextNonEmpty + 1; i < parser.lines.length; i++) {
+              if (parser.lines[i].length > 0) {
+                tempNextLine = i + 1;
+                break;
+              }
+            }
+            for (var i = 0; i < metrics.methods.length; i++) {
+              if (metrics.methods[i].startLine === tempNextLine) {
+                links.push([
+                  convertToObject(comment),
+                  convertToObject(metrics.methods[i]),
+                ]);
+                continue findLinks;
+              }
+            }
+          }
+
+          // if next line contains for loop
+          if (
+            commentText?.includes("loop") ||
+            commentText?.includes("loops") ||
+            commentText?.includes("iteration") ||
+            commentText?.includes("iterations") ||
+            commentText?.includes("iterate") ||
+            commentText?.includes("iterates") ||
+            commentText?.includes("go through") ||
+            commentText?.includes("goes through") ||
+            commentText?.includes("fill")
+          ) {
+            for (var i = 0; i < metrics.forLoops.length; i++) {
+              if (metrics.forLoops[i].startLine === nextNonEmpty) {
+                links.push([
+                  convertToObject(comment),
+                  convertToObject(metrics.forLoops[i]),
+                ]);
+                continue findLinks;
+              }
+            }
+            for (var i = 0; i < metrics.whileLoops.length; i++) {
+              if (metrics.whileLoops[i].startLine === nextNonEmpty) {
+                links.push([
+                  convertToObject(comment),
+                  convertToObject(metrics.whileLoops[i]),
+                ]);
+                continue findLinks;
+              }
+            }
+          }
+
+          // if next line contains if, else if or else statements
+          if (
+            commentText?.includes("else") ||
+            commentText?.includes("check") ||
+            commentText?.includes("checking") ||
+            commentText?.includes("whether") ||
+            commentText?.includes("else if") ||
+            commentText?.includes("elif") ||
+            commentText?.includes("if")
+          ) {
+            for (var i = 0; i < metrics.ifElseStatements.length; i++) {
+              if (metrics.ifElseStatements[i].startLine === nextNonEmpty) {
+                links.push([
+                  convertToObject(comment),
+                  convertToObject(metrics.ifElseStatements[i]),
+                ]);
+                continue findLinks;
+              }
+            }
+          }
+        }
+      }
+    }
+    console.log("links:", links);
   });
 }
 
