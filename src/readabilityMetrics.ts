@@ -6,10 +6,13 @@ export class Metrics {
   public classes: any = [];
   public interfaces: any = [];
   public forLoops: any = [];
-  public ifStatements: any = [];
+  public ifElseStatements: any = [];
   public whileLoops: any = [];
   public switchStatements: any = [];
   public doStatements: any = [];
+  public initAndDeclStatements: any = [];
+  public assignmentStatements: any = [];
+  public blocks: any = [];
 
   public getBlocks = () => {
     const editor = vscode.window.activeTextEditor;
@@ -26,6 +29,10 @@ export class Metrics {
 
       process.stdout.write(`${s.name},`);
 
+      // if (s.location?.startLine === 95 && s.location?.endLine === 99) {
+      //   console.log(`${s.name}`, s.location);
+      // }
+
       if (s.name === "methodDeclaration") {
         this.methods.push(s.location);
       } else if (s.name === "classDeclaration") {
@@ -33,7 +40,7 @@ export class Metrics {
       } else if (s.name === "forStatement") {
         this.forLoops.push(s.location);
       } else if (s.name === "ifStatement") {
-        this.ifStatements.push(s.location);
+        this.ifElseStatements.push(s.location);
       } else if (s.name === "whileStatement") {
         this.whileLoops.push(s.location);
       } else if (s.name === "switchStatement") {
@@ -42,6 +49,12 @@ export class Metrics {
         this.doStatements.push(s.location);
       } else if (s.name === "interfaceDeclaration") {
         this.interfaces.push(s.location);
+      } else if (s.name === "variableDeclarator") {
+        this.initAndDeclStatements.push(s.location);
+      } else if (s.name === "statementExpression") {
+        this.assignmentStatements.push(s.location);
+      } else if (s.name === "block") {
+        this.blocks.push(s.location);
       }
 
       if (s.children) {
@@ -62,9 +75,33 @@ export class Metrics {
       }
     }
 
+    // distinguishing between if, else if and else blocks
+    var temp: any[] = [];
+    var flag: boolean;
+
+    for (let i = 0; i < this.blocks.length; i++) {
+      flag = false;
+      for (let j = 0; j < this.ifElseStatements.length; j++) {
+        if (
+          this.blocks[i].startLine >= this.ifElseStatements[j].startLine &&
+          this.blocks[i].endLine <= this.ifElseStatements[j].endLine
+        ) {
+          flag = true;
+          break;
+        }
+      }
+      if (flag) {
+        temp.push(this.blocks[i]);
+      }
+    }
+    this.ifElseStatements = [];
+    for (let i = 0; i < temp.length; i++) {
+      this.ifElseStatements.push(temp[i]);
+    }
+
     this.forLoops = this.removeNested(this.forLoops, this.forLoops);
 
-    console.log(this.forLoops);
+    // console.log(this.forLoops);
   };
 
   removeNested = (innerArray: any, outerArray: any) => {
