@@ -41,7 +41,7 @@ public class EggDropping {
                 }
             }
         }
-
+        
         switch (x) {
             case 0:
                 System.out.println("0");
