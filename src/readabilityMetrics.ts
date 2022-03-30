@@ -13,6 +13,7 @@ export class Metrics {
   public initAndDeclStatements: any = [];
   public assignmentStatements: any = [];
   public blocks: any = [];
+  public caseBlocks: any = [];
 
   public getBlocks = () => {
     const editor = vscode.window.activeTextEditor;
@@ -55,6 +56,8 @@ export class Metrics {
         this.assignmentStatements.push(s.location);
       } else if (s.name === "block") {
         this.blocks.push(s.location);
+      } else if (s.name === "switchBlockStatementGroup") {
+        this.caseBlocks.push(s.location);
       }
 
       if (s.children) {
@@ -99,9 +102,29 @@ export class Metrics {
       this.ifElseStatements.push(temp[i]);
     }
 
+    // distinguishing case blocks
+    temp = [];
+
+    for (let i = 0; i < this.caseBlocks.length; i++) {
+      flag = false;
+      for (let j = 0; j < this.switchStatements.length; j++) {
+        if (
+          this.caseBlocks[i].startLine >= this.ifElseStatements[j].startLine &&
+          this.caseBlocks[i].endLine <= this.ifElseStatements[j].endLine
+        ) {
+          flag = true;
+          break;
+        }
+      }
+      if (flag) {
+        temp.push(this.caseBlocks[i]);
+      }
+    }
+
     this.forLoops = this.removeNested(this.forLoops, this.forLoops);
 
-    // console.log(this.forLoops);
+    // console.log(this.switchStatements);
+    // console.log(this.caseBlocks);
   };
 
   removeNested = (innerArray: any, outerArray: any) => {
