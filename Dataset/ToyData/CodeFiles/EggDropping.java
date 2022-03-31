@@ -41,7 +41,7 @@ public class EggDropping {
                 }
             }
         }
-        
+
         switch (x) {
             case 0:
                 System.out.println("0");
@@ -71,4 +71,6 @@ public class EggDropping {
         int result = minTrials(n, m);
         System.out.println(result);
     }
+
+    // the above function is main function
 }

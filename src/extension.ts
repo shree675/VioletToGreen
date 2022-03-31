@@ -157,12 +157,13 @@ export function activate(context: vscode.ExtensionContext) {
       keywords: string[],
       comment: any,
       commentText: string,
-      metricsArray: any
+      metricsArray: any,
+      nextNonEmpty: any
     ) => {
       for (const keyword in keywords) {
         if (commentText.includes(keyword)) {
           for (var i = 0; i < metricsArray.length; i++) {
-            if (metricsArray[i].startLine > comment.startLine) {
+            if (metricsArray[i].startLine === nextNonEmpty) {
               links.push([
                 convertToObject(comment),
                 convertToObject(metricsArray[i]),
@@ -175,14 +176,80 @@ export function activate(context: vscode.ExtensionContext) {
       return false;
     };
 
-    const notContainsKeyword = (comment: any, metricsArray: any) => {
+    const containsKeywordPrev = (
+      keywords: string[],
+      comment: any,
+      commentText: string,
+      metricsArray: any,
+      prevNonEmpty: any
+    ) => {
+      for (const keyword in keywords) {
+        if (commentText.includes(keyword)) {
+          for (var i = metricsArray.length - 1; i >= 0; i--) {
+            if (metricsArray[i].endLine === prevNonEmpty) {
+              links.push([
+                convertToObject(comment),
+                convertToObject(metricsArray[i]),
+              ]);
+              return true;
+            }
+          }
+        }
+      }
+      return false;
+    };
+
+    const notContainsKeyword = (
+      nextNonEmpty: any,
+      comment: any,
+      metricsArray: any
+    ) => {
       for (var i = 0; i < metricsArray.length; i++) {
-        if (metricsArray[i].startLine > comment.startLine) {
+        if (metricsArray[i].startLine === nextNonEmpty) {
           links.push([
             convertToObject(comment),
             convertToObject(metricsArray[i]),
           ]);
           return true;
+        }
+      }
+      return false;
+    };
+
+    const notContainsKeywordInline = (comment: any, metricsArray: any) => {
+      for (var i = 0; i < metricsArray.length; i++) {
+        if (
+          metricsArray[i].startLine === comment.startLine &&
+          metricsArray[i].endLine === comment.startLine
+        ) {
+          links.push([
+            convertToObject(comment),
+            convertToObject(metricsArray[i]),
+          ]);
+          return true;
+        }
+      }
+      return false;
+    };
+
+    const containsKeywordInside = (
+      keywords: any,
+      comment: any,
+      commentText: string,
+      metricsArray: any,
+      prevNonEmpty: any
+    ) => {
+      for (const keyword in keywords) {
+        if (commentText.includes(keyword)) {
+          for (var i = 0; i < metricsArray.length; i++) {
+            if (metricsArray[i].startLine === prevNonEmpty) {
+              links.push([
+                convertToObject(comment),
+                convertToObject(metricsArray[i]),
+              ]);
+              return true;
+            }
+          }
         }
       }
       return false;
@@ -200,94 +267,106 @@ export function activate(context: vscode.ExtensionContext) {
     };
 
     findLinks: for (const comment of parser?.comments!) {
-      // if it is a multiline comment
-      if (comment.type === parser?.enums.multiline) {
-        var nextNonEmpty = -1;
-        for (var i = comment.endLine; i < parser.lines.length; i++) {
-          if (parser.lines[i].length > 0) {
-            nextNonEmpty = i + 1;
-            break;
-          }
+      var nextNonEmpty = -1;
+      var prevNonEmpty = -1;
+      for (var i = comment.endLine; i < parser?.lines.length!; i++) {
+        if (parser!.lines[i].length > 0) {
+          nextNonEmpty = i + 1;
+          break;
         }
-        const pos1 = new vscode.Position(
-          comment.startLine - 1,
-          comment.startCharacter
-        );
-        const pos2 = new vscode.Position(
-          comment.endLine - 1,
-          comment.endCharacter
-        );
-        const commentText = editor?.document
-          .getText(new vscode.Selection(pos1, pos2))
-          .toLocaleLowerCase();
-
+      }
+      for (var i = comment.startLine; i >= 0; i--) {
+        if (parser!.lines[i].length > 0) {
+          prevNonEmpty = i;
+          break;
+        }
+      }
+      const pos1 = new vscode.Position(
+        comment.startLine - 1,
+        comment.startCharacter
+      );
+      const pos2 = new vscode.Position(
+        comment.endLine - 1,
+        comment.endCharacter
+      );
+      const commentText = editor?.document
+        .getText(new vscode.Selection(pos1, pos2))
+        .toLocaleLowerCase();
+      // if it is a multiline and single line comment
+      if (
+        comment.type === parser?.enums.multiline ||
+        comment.type === parser?.enums.singleLine
+      ) {
         if (nextNonEmpty !== -1) {
-          // if next line is a class declaration
-          if (notContainsKeyword(comment, metrics.classes)) {
-            continue findLinks;
-          }
-
-          // if next line is an interface declaration
-          if (notContainsKeyword(comment, metrics.interfaces)) {
-            continue findLinks;
-          }
-
-          // if the class declaration is somewhere else
           keywordsArray = ["class", "@author", "program"];
           if (
             containsKeyword(
               keywordsArray,
               comment,
               commentText!,
-              metrics.classes
+              metrics.classes,
+              nextNonEmpty
             )
           ) {
             continue findLinks;
           }
 
-          // if the interface declaration is somewhere else
           keywordsArray = ["interface", "@author"];
           if (
             containsKeyword(
               keywordsArray,
               comment,
               commentText!,
-              metrics.interfaces
+              metrics.interfaces,
+              nextNonEmpty
             )
           ) {
             continue findLinks;
           }
 
           // if next line is function declaration
+          keywordsArray = [
+            "@param",
+            "@return",
+            "function",
+            "method",
+            "routine",
+            "routines",
+            "subroutine",
+            "subroutines",
+            "returns",
+            "@throws",
+            "@exception",
+            "driver",
+            "constructor",
+            "destructor",
+            "recurse",
+            "recursive",
+            "recursion",
+            "create",
+            "creating",
+            "recursing",
+          ];
           if (!commentText?.includes("above")) {
-            keywordsArray = [
-              "@param",
-              "@return",
-              "function",
-              "method",
-              "routine",
-              "routines",
-              "subroutine",
-              "subroutines",
-              "returns",
-              "@throws",
-              "@exception",
-              "driver",
-              "constructor",
-              "destructor",
-              "recurse",
-              "recursive",
-              "recursion",
-              "create",
-              "creating",
-              "recursing",
-            ];
             if (
               containsKeyword(
                 keywordsArray,
                 comment,
                 commentText!,
-                metrics.methods
+                metrics.methods,
+                nextNonEmpty
+              )
+            ) {
+              continue findLinks;
+            }
+          } else {
+            if (
+              containsKeywordPrev(
+                keywordsArray,
+                comment,
+                commentText!,
+                metrics.methods,
+                prevNonEmpty
               )
             ) {
               continue findLinks;
@@ -296,8 +375,8 @@ export function activate(context: vscode.ExtensionContext) {
 
           // if next line is @Override or @Deprecated, then its next line is a function
           if (
-            parser.lines[nextNonEmpty].trim() === "@Override" ||
-            parser.lines[nextNonEmpty].trim() === "@Deprecated"
+            parser.lines[nextNonEmpty - 1].trim() === "@Override" ||
+            parser.lines[nextNonEmpty - 1].trim() === "@Deprecated"
           ) {
             var tempNextLine = nextNonEmpty + 1;
             for (var i = nextNonEmpty + 1; i < parser.lines.length; i++) {
@@ -318,25 +397,26 @@ export function activate(context: vscode.ExtensionContext) {
           }
 
           // if next line contains for or while loop
+          keywordsArray = [
+            "loop",
+            "loops",
+            "iteration",
+            "iterations",
+            "iterate",
+            "iterates",
+            "go through",
+            "goes through",
+            "fill",
+            "until",
+          ];
           if (!commentText?.includes("above")) {
-            keywordsArray = [
-              "loop",
-              "loops",
-              "iteration",
-              "iterations",
-              "iterate",
-              "iterates",
-              "go through",
-              "goes through",
-              "fill",
-              "until",
-            ];
             if (
               containsKeyword(
                 keywordsArray,
                 comment,
                 commentText!,
-                metrics.forLoops
+                metrics.forLoops,
+                nextNonEmpty
               )
             ) {
               continue findLinks;
@@ -346,7 +426,31 @@ export function activate(context: vscode.ExtensionContext) {
                 keywordsArray,
                 comment,
                 commentText!,
-                metrics.whileLoops
+                metrics.whileLoops,
+                nextNonEmpty
+              )
+            ) {
+              continue findLinks;
+            }
+          } else {
+            if (
+              containsKeywordPrev(
+                keywordsArray,
+                comment,
+                commentText!,
+                metrics.forLoops,
+                prevNonEmpty
+              )
+            ) {
+              continue findLinks;
+            }
+            if (
+              containsKeywordPrev(
+                keywordsArray,
+                comment,
+                commentText!,
+                metrics.whileLoops,
+                prevNonEmpty
               )
             ) {
               continue findLinks;
@@ -360,49 +464,48 @@ export function activate(context: vscode.ExtensionContext) {
               keywordsArray,
               comment,
               commentText!,
-              metrics.switchStatements
+              metrics.switchStatements,
+              nextNonEmpty
             )
           ) {
             continue findLinks;
           }
 
           // if next line contains case statement
-          if (!commentText?.includes("above")) {
-            keywordsArray = ["case", "default", "if"];
-            if (
-              containsKeyword(
-                keywordsArray,
-                comment,
-                commentText!,
-                metrics.caseBlocks
-              )
-            ) {
-              continue findLinks;
-            }
+          keywordsArray = ["case", "default", "if"];
+          if (
+            containsKeyword(
+              keywordsArray,
+              comment,
+              commentText!,
+              metrics.caseBlocks,
+              nextNonEmpty
+            )
+          ) {
+            continue findLinks;
           }
 
           // if next line contains if, else if or else statements
-          if (!commentText?.includes("above")) {
-            keywordsArray = [
-              "else",
-              "check",
-              "checking",
-              "whether",
-              "else if",
-              "elif",
-              "if",
-              "otherwise",
-            ];
-            if (
-              containsKeyword(
-                keywordsArray,
-                comment,
-                commentText!,
-                metrics.ifElseStatements
-              )
-            ) {
-              continue findLinks;
-            }
+          keywordsArray = [
+            "else",
+            "check",
+            "checking",
+            "whether",
+            "else if",
+            "elif",
+            "if",
+            "otherwise",
+          ];
+          if (
+            containsKeyword(
+              keywordsArray,
+              comment,
+              commentText!,
+              metrics.ifElseStatements,
+              nextNonEmpty
+            )
+          ) {
+            continue findLinks;
           }
 
           // if the next line is a variable declaration
@@ -422,13 +525,14 @@ export function activate(context: vscode.ExtensionContext) {
               keywordsArray,
               comment,
               commentText!,
-              metrics.initAndDeclStatements
+              metrics.initAndDeclStatements,
+              nextNonEmpty
             )
           ) {
             continue findLinks;
           }
 
-          // if the next line is an assignment statements
+          // if the next line is an assignment statement
           keywordsArray = [
             "assign",
             "set",
@@ -443,22 +547,184 @@ export function activate(context: vscode.ExtensionContext) {
               keywordsArray,
               comment,
               commentText!,
-              metrics.assignmentStatements
+              metrics.assignmentStatements,
+              nextNonEmpty
             )
           ) {
             continue findLinks;
           }
 
           // if the above condition is not satisfied
-          // first link it if the next line is a loop statement
-          if (notContainsKeyword(comment, metrics.forLoops)) {
-            continue findLinks;
-          }
-          if (notContainsKeyword(comment, metrics.whileLoops)) {
+          // if next line is a class declaration
+          if (notContainsKeyword(nextNonEmpty, comment, metrics.classes)) {
             continue findLinks;
           }
 
-          // otherwise check if it is an assignment statement again
+          // if next line is an interface declaration
+          if (notContainsKeyword(nextNonEmpty, comment, metrics.interfaces)) {
+            continue findLinks;
+          }
+          // first link it if the next line is a function
+          if (!commentText?.includes("above")) {
+            if (notContainsKeyword(nextNonEmpty, comment, metrics.methods)) {
+              continue findLinks;
+            }
+          }
+
+          // second link it if the next line is a loop statement
+          if (notContainsKeyword(nextNonEmpty, comment, metrics.forLoops)) {
+            continue findLinks;
+          }
+          if (notContainsKeyword(nextNonEmpty, comment, metrics.whileLoops)) {
+            continue findLinks;
+          }
+
+          // third link it if the next line is a conditional statement
+          if (
+            notContainsKeyword(nextNonEmpty, comment, metrics.ifElseStatements)
+          ) {
+            continue findLinks;
+          }
+
+          // fourth link it if the next line is a declaration or assignment statement
+          if (
+            notContainsKeyword(
+              nextNonEmpty,
+              comment,
+              metrics.initAndDeclStatements
+            )
+          ) {
+            continue findLinks;
+          }
+          if (
+            notContainsKeyword(
+              nextNonEmpty,
+              comment,
+              metrics.assignmentStatements
+            )
+          ) {
+            continue findLinks;
+          }
+        } else if (prevNonEmpty !== -1) {
+          // check if the comment is written inside a function body
+          keywordsArray = [
+            "@param",
+            "@return",
+            "function",
+            "method",
+            "routine",
+            "routines",
+            "subroutine",
+            "subroutines",
+            "returns",
+            "@throws",
+            "@exception",
+            "driver",
+            "constructor",
+            "destructor",
+            "recurse",
+            "recursive",
+            "recursion",
+            "create",
+            "creating",
+            "recursing",
+          ];
+          if (
+            containsKeywordInside(
+              keywordsArray,
+              comment,
+              commentText!,
+              metrics.methods,
+              prevNonEmpty
+            )
+          ) {
+            continue findLinks;
+          }
+
+          // check if the comment is written inside a loop body
+          keywordsArray = [
+            "loop",
+            "loops",
+            "iteration",
+            "iterations",
+            "iterate",
+            "iterates",
+            "go through",
+            "goes through",
+            "fill",
+            "until",
+          ];
+
+          if (
+            containsKeywordInside(
+              keywordsArray,
+              comment,
+              commentText!,
+              metrics.forLoops,
+              prevNonEmpty
+            ) ||
+            containsKeywordInside(
+              keywordsArray,
+              comment,
+              commentText!,
+              metrics.whileLoops,
+              prevNonEmpty
+            )
+          ) {
+            continue findLinks;
+          }
+
+          // check if the comment is written inside an if, elif or else body
+          keywordsArray = [
+            "else",
+            "check",
+            "checking",
+            "whether",
+            "else if",
+            "elif",
+            "if",
+            "otherwise",
+          ];
+          if (
+            containsKeywordInside(
+              keywordsArray,
+              comment,
+              commentText!,
+              metrics.ifElseStatements,
+              prevNonEmpty
+            )
+          ) {
+            continue findLinks;
+          }
+
+          // check if the comment is written inside a case block
+          keywordsArray = ["case", "default", "if"];
+          if (
+            containsKeywordInside(
+              keywordsArray,
+              comment,
+              commentText!,
+              metrics.caseBlocks,
+              prevNonEmpty
+            )
+          ) {
+            continue findLinks;
+          }
+        }
+      } else {
+        // if the current line is a declaration statement
+        if (notContainsKeywordInline(comment, metrics.initAndDeclStatements)) {
+          continue findLinks;
+        }
+
+        // if the current line is an assignment statement
+        if (notContainsKeywordInline(comment, metrics.assignmentStatements)) {
+          continue findLinks;
+        }
+
+        // if the current line is an if, else if or else statement
+        if (notContainsKeywordInline(comment, metrics.ifElseStatements)) {
+          continue findLinks;
         }
       }
     }
