@@ -34,7 +34,7 @@ const TAG = "COMMENTS";
 
 export function linkComments(editor?: vscode.TextEditor) {
   if (!editor) {
-    return;
+    return null;
   }
 
   const singleLinedComments = /[/]{2}.*(?:(?:\r\n|\r|\n) *[/].*)*/gm;

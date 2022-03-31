@@ -34,30 +34,59 @@ export class Metrics {
       //   console.log(`${s.name}`, s.location);
       // }
 
-      if (s.name === "methodDeclaration") {
-        this.methods.push(s.location);
-      } else if (s.name === "classDeclaration") {
-        this.classes.push(s.location);
-      } else if (s.name === "forStatement") {
-        this.forLoops.push(s.location);
-      } else if (s.name === "ifStatement") {
-        this.ifElseStatements.push(s.location);
-      } else if (s.name === "whileStatement") {
-        this.whileLoops.push(s.location);
-      } else if (s.name === "switchStatement") {
-        this.switchStatements.push(s.location);
-      } else if (s.name === "doStatement") {
-        this.doStatements.push(s.location);
-      } else if (s.name === "interfaceDeclaration") {
-        this.interfaces.push(s.location);
-      } else if (s.name === "variableDeclarator") {
-        this.initAndDeclStatements.push(s.location);
-      } else if (s.name === "statementExpression") {
-        this.assignmentStatements.push(s.location);
-      } else if (s.name === "block") {
-        this.blocks.push(s.location);
-      } else if (s.name === "switchBlockStatementGroup") {
-        this.caseBlocks.push(s.location);
+      // if (s.location?.startLine >= 71 && s.location?.endLine <= 71) {
+      //   console.log(`${s.name}`, s.location);
+      // }
+
+      switch (s.name) {
+        case "methodDeclaration": {
+          this.methods.push(s.location);
+          break;
+        }
+        case "classDeclaration": {
+          this.classes.push(s.location);
+          break;
+        }
+        case "forStatement": {
+          this.forLoops.push(s.location);
+          break;
+        }
+        case "ifStatement": {
+          this.ifElseStatements.push(s.location);
+          break;
+        }
+        case "whileStatement": {
+          this.whileLoops.push(s.location);
+          break;
+        }
+        case "switchStatement": {
+          this.switchStatements.push(s.location);
+          break;
+        }
+        case "doStatement": {
+          this.doStatements.push(s.location);
+          break;
+        }
+        case "interfaceDeclaration": {
+          this.interfaces.push(s.location);
+          break;
+        }
+        case "variableDeclarator": {
+          this.initAndDeclStatements.push(s.location);
+          break;
+        }
+        case "statementExpression": {
+          this.assignmentStatements.push(s.location);
+          break;
+        }
+        case "block": {
+          this.blocks.push(s.location);
+          break;
+        }
+        case "switchBlockStatementGroup": {
+          this.caseBlocks.push(s.location);
+          break;
+        }
       }
 
       if (s.children) {
@@ -121,7 +150,9 @@ export class Metrics {
       }
     }
 
-    this.forLoops = this.removeNested(this.forLoops, this.forLoops);
+    // this.forLoops = this.removeNested(this.forLoops, this.forLoops);
+
+    // console.log(this.ifElseStatements);
 
     // console.log(this.switchStatements);
     // console.log(this.caseBlocks);
