@@ -1,4 +1,5 @@
 import * as vscode from "vscode";
+import axios from "axios";
 
 // types of comments
 enum CommentType {
@@ -18,7 +19,6 @@ const getLine = (text: string, index: number) => {
   return numNewLines;
 };
 
-
 /**
  * A function that returns the column number of the matched comment
  * @param text full text of the document
@@ -33,8 +33,7 @@ const getColumn = (text: string, index: number) => {
 
 const TAG = "COMMENTS";
 
-
-export function linkComments(editor?: vscode.TextEditor) {
+export async function linkComments(editor?: vscode.TextEditor) {
   if (!editor) {
     return;
   }
@@ -56,7 +55,6 @@ export function linkComments(editor?: vscode.TextEditor) {
 
   const multiLineMatches = text.matchAll(multilinedComment);
   for (const match of multiLineMatches) {
-
     // TODO: match.index will not be null
     // because we are having a global flag in the pattern
     // but make sure to try to come up with cases where this can
@@ -66,10 +64,7 @@ export function linkComments(editor?: vscode.TextEditor) {
     const endLine = getLine(text, match.index! + match[0].length);
 
     const startCharacter = getColumn(text, match.index!);
-    const endCharacter = getColumn(
-      text,
-      match.index! + match[0].length
-    );
+    const endCharacter = getColumn(text, match.index! + match[0].length);
 
     comments.push({
       comment: match[0],
@@ -87,10 +82,7 @@ export function linkComments(editor?: vscode.TextEditor) {
     const endLine = getLine(text, match.index! + match[0].length);
 
     const startCharacter = getColumn(text, match.index!);
-    const endCharacter = getColumn(
-      text,
-      match.index! + match[0].length
-    );
+    const endCharacter = getColumn(text, match.index! + match[0].length);
 
     let commentType = CommentType.inline;
 
@@ -109,4 +101,28 @@ export function linkComments(editor?: vscode.TextEditor) {
   }
 
   console.log(TAG, comments);
+
+  for (const comment of comments) {
+    if (comment.type === CommentType.singleLine) {
+      let commentString = comment.comment;
+
+      // console.log("This is a single line comment : " + commentString);
+
+      // temp is an array of comments lines
+      let temp = commentString.split("\n").map((cmnt) => {
+        return cmnt.trim().substring(2).trim();
+      });
+
+      console.log(temp);
+
+      // const jsonBody = JSON.stringify({ code: temp });
+      // console.log(jsonBody);
+
+      let res = await axios.post("http://10.21.4.118:5000/guesslang", {
+        code: temp,
+      });
+      let data = res.data;
+      console.log(data);
+    }
+  }
 }
