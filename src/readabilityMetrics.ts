@@ -15,9 +15,7 @@ export class Metrics {
   public blocks: any = [];
   public caseBlocks: any = [];
 
-  public getBlocks = () => {
-    const editor = vscode.window.activeTextEditor;
-    const javaText = editor?.document.getText();
+  public getBlocks = (javaText: string) => {
     const cst = parse(javaText);
 
     let q = [cst];
