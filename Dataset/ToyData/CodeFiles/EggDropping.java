@@ -8,6 +8,7 @@
 public class EggDropping {
 
     // min trials with n eggs and m floors
+
     private static int minTrials(int n, int m) {
 
         int[][] eggFloor = new int[n + 1][m + 1];
@@ -33,30 +34,37 @@ public class EggDropping {
                     // choose min of all values for particular x
                     if (result < eggFloor[i][j]) {
                         eggFloor[i][j] = result;
-                    } else if (a == b) {
+                    } else if (a == b) { // the above equation
                         System.out.println("a==b");
-                    } else {
+                    } else { // this is here
                         System.out.println("a!=b");
                     }
                 }
             }
         }
 
+        // in here
         switch (x) {
+            // no keyword
             case 0:
+                // inside case
                 System.out.println("0");
                 break;
             case 1:
+                // inside no keyword
                 System.out.println("1");
                 break;
+            // this case is here
             default:
                 System.out.println(x);
                 break;
         }
 
+        // hello
         do {
             System.out.println("x");
         } while (x == 0);
+        // the above loop
 
         while (true) {
             System.out.println("");
