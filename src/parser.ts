@@ -32,15 +32,14 @@ const getColumn = (text: string, index: number) => {
 
 const TAG = "COMMENTS";
 
-export function linkComments(editor?: vscode.TextEditor) {
-  if (!editor) {
+export function linkComments(text: string) {
+  if (!text) {
     return null;
   }
 
   const singleLinedComments = /[/]{2}.*(?:(?:\r\n|\r|\n) *[/].*)*/gm;
   const multilinedComment = /\/\*[\s\S]*?\*\//gm;
 
-  const text = editor.document.getText();
   const lines = text.split("\n");
 
   const comments: Array<{
