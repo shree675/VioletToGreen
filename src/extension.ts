@@ -146,7 +146,49 @@ export function activate(context: vscode.ExtensionContext) {
   vscode.commands.registerCommand("violet-to-green.linkAutomatically", () => {
     const editor = vscode.window.activeTextEditor;
     const javaText = editor?.document.getText();
-    runHeuristics(javaText!);
+    const filesPath = path.resolve(
+      __dirname,
+      "..",
+      "Dataset",
+      "RealWorldData",
+      "CodeFiles",
+      "test"
+    );
+    const outputPath = path.join(
+      __dirname,
+      "..",
+      "Dataset",
+      "RealWorldData",
+      "Predictions",
+      "test"
+    );
+    var filesLimit = 5;
+    var predictions: string;
+
+    fs.readdirSync(filesPath)
+      .slice(0, filesLimit)
+      .forEach(function (filename: string) {
+        fs.readFile(
+          path.join(filesPath, filename),
+          "utf-8",
+          function (err: any, content: any) {
+            if (err) {
+              vscode.window.showErrorMessage(err);
+              return;
+            }
+            filesLimit--;
+            predictions = runHeuristics(content);
+            fs.writeFile(
+              path.join(outputPath, filename.split(".")[0] + ".txt"),
+              predictions,
+              (err: any) => {
+                vscode.window.showErrorMessage(err);
+              }
+            );
+          }
+        );
+      });
+    // console.log(runHeuristics(javaText!));
   });
 }
 

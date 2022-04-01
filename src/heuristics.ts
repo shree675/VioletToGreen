@@ -3,7 +3,7 @@ import { linkComments } from "./parser";
 import { Metrics } from "./readabilityMetrics";
 
 export const runHeuristics = (javaText: string) => {
-  const parser = linkComments(vscode.window.activeTextEditor);
+  const parser = linkComments(javaText);
   const metrics = new Metrics();
   const editor = vscode.window.activeTextEditor;
   var links = [];
@@ -627,12 +627,26 @@ export const runHeuristics = (javaText: string) => {
       }
     }
   }
-  console.log(links.length);
+  //   console.log(links.length);
+  var annotations: string = "";
   for (var i = 0; i < links.length; i++) {
-    console.log("--------");
-    console.log(
-      "Comment: " + links[i][0].startLine + " - " + links[i][0].endLine
-    );
-    console.log("Code: " + links[i][1].startLine + " - " + links[i][1].endLine);
+    annotations +=
+      links[i][0].startLine +
+      "," +
+      links[i][0].startCharacter +
+      "," +
+      links[i][0].endLine +
+      "," +
+      links[i][0].endCharacter +
+      "," +
+      links[i][1].startLine +
+      "," +
+      links[i][1].startCharacter +
+      "," +
+      links[i][1].endLine +
+      "," +
+      links[i][1].endCharacter +
+      " ``\n";
   }
+  return annotations;
 };

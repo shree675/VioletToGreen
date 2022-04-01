@@ -32,11 +32,12 @@ export class Metrics {
       //   console.log(`${s.name}`, s.location);
       // }
 
-      // if (s.location?.startLine >= 71 && s.location?.endLine <= 71) {
+      // if (s.location?.startLine >= 38 && s.location?.endLine <= 41) {
       //   console.log(`${s.name}`, s.location);
       // }
 
       switch (s.name) {
+        case "constructorDeclaration":
         case "methodDeclaration": {
           this.methods.push(s.location);
           break;
@@ -153,7 +154,7 @@ export class Metrics {
     // console.log(this.ifElseStatements);
 
     // console.log(this.switchStatements);
-    // console.log(this.caseBlocks);
+    // console.log(this.methods);
   };
 
   removeNested = (innerArray: any, outerArray: any) => {
