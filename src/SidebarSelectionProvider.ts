@@ -46,12 +46,6 @@ export class SidebarSelectionProvider implements vscode.WebviewViewProvider {
         }
         case "requestSelection": {
           const editor = vscode.window.activeTextEditor;
-          // const pos1 = new vscode.Position(0, 2);
-          // const pos2 = new vscode.Position(4, 2);
-          // const selection = editor?.document.getText(
-          //   new vscode.Selection(pos1, pos2)
-          // );
-          // console.log("abc", selection);
           const selectionString = editor?.document.getText(editor.selection);
           this._view?.webview.postMessage({
             type: "responseSelection",

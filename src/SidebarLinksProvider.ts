@@ -51,8 +51,6 @@ export class SidebarLinksProvider implements vscode.WebviewViewProvider {
 
     vscode.window.onDidChangeTextEditorSelection((e) => {
       var cursor = vscode.window.activeTextEditor?.selection.active;
-      console.log(cursor);
-      console.log(arrayRange);
       while (decorationType.length > 0) {
         decorationType[decorationType.length - 1].dispose();
         decorationType.pop();
@@ -117,7 +115,6 @@ export class SidebarLinksProvider implements vscode.WebviewViewProvider {
                 const selectionString = editor?.document.getText(
                   new vscode.Selection(pos1, pos2)
                 );
-                console.log("aaaaaa", selectionString);
                 arrayRange[i][j].string = selectionString;
               }
             }

@@ -33,24 +33,23 @@ const getColumn = (text: string, index: number) => {
 
 const TAG = "COMMENTS";
 
-export async function linkComments(editor?: vscode.TextEditor) {
-  if (!editor) {
-    return;
+export function linkComments(text: string) {
+  if (!text) {
+    return null;
   }
 
   const singleLinedComments = /[/]{2}.*(?:(?:\r\n|\r|\n) *[/].*)*/gm;
   const multilinedComment = /\/\*[\s\S]*?\*\//gm;
 
-  const text = editor.document.getText();
   const lines = text.split("\n");
 
   const comments: Array<{
     comment: string;
     type: CommentType;
-    startCharacter: Number;
-    startLine: Number;
-    endCharacter: Number;
-    endLine: Number;
+    startCharacter: number;
+    startLine: number;
+    endCharacter: number;
+    endLine: number;
   }> = [];
 
   const multiLineMatches = text.matchAll(multilinedComment);
@@ -101,28 +100,5 @@ export async function linkComments(editor?: vscode.TextEditor) {
   }
 
   console.log(TAG, comments);
-
-  for (const comment of comments) {
-    if (comment.type === CommentType.singleLine) {
-      let commentString = comment.comment;
-
-      // console.log("This is a single line comment : " + commentString);
-
-      // temp is an array of comments lines
-      let temp = commentString.split("\n").map((cmnt) => {
-        return cmnt.trim().substring(2).trim();
-      });
-
-      console.log(temp);
-
-      // const jsonBody = JSON.stringify({ code: temp });
-      // console.log(jsonBody);
-
-      let res = await axios.post("http://10.21.4.118:5000/guesslang", {
-        code: temp,
-      });
-      let data = res.data;
-      console.log(data);
-    }
-  }
+  return { comments: comments, lines: lines, enums: CommentType };
 }
