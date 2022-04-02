@@ -27,6 +27,7 @@ def evaluate_single_file(code_file_name, label_file_name, prediction_file_name, 
     """
     code_file = open(code_file_name, 'r')
     code_lines = code_file.readlines()
+    print(label_file_name)
     label_file = open(label_file_name, 'r')
     label_lines = label_file.readlines()
     prediction_file = open(prediction_file_name, 'r')
@@ -51,7 +52,9 @@ def evaluate_single_file(code_file_name, label_file_name, prediction_file_name, 
                        'code_start_char': int(parts[5]),
                        'code_end_row': int(parts[6]),
                        'code_end_char': int(parts[7])})
-    # print(labels)
+    print('labels:')
+    # for label in labels:
+    #     print(label.values())
 
     # print("Prediction File")
     for line in prediction_lines:
@@ -64,7 +67,11 @@ def evaluate_single_file(code_file_name, label_file_name, prediction_file_name, 
                             'code_start_char': int(parts[5]),
                             'code_end_row': int(parts[6]),
                             'code_end_char': int(parts[7])})
-    # print(predictions)
+    print()
+    print()
+    print('pred:')
+    # for label in predictions:
+    #     print(label.values())
 
     # print('--------------------------------')
     total_accuracy = 0.0
@@ -80,6 +87,8 @@ def evaluate_single_file(code_file_name, label_file_name, prediction_file_name, 
                 # print("comment match found")
                 flag_label = label
                 break
+
+        # print(prediction['comment_start_row'], label['comment_start_row'])
 
         row_number = prediction['code_start_row']
         prediction_length = 0
@@ -137,6 +146,7 @@ def evaluate_single_file(code_file_name, label_file_name, prediction_file_name, 
         accuracy = float(overlap_length)/float(total_length)
         total_accuracy += accuracy
         if verbose == True:
+            print(prediction['comment_start_row'])
             print("Accuracy: {0:.4f}".format(accuracy))
         comment_count += 1
     if comment_count == 0:
@@ -163,7 +173,6 @@ def evaluate_set(file_set, verbose):
     count = 0
     # prediction_files = os.listdir(dir_name + 'Predictions/')
     prediction_files = os.listdir(dir_name + 'Predictions/test/')
-    print(dir_name + 'Predictions/test/')
     for filename in prediction_files:
         if filename.endswith('.txt') == True:
             # code_file_name = dir_name + 'CodeFiles/' + \
@@ -179,7 +188,10 @@ def evaluate_set(file_set, verbose):
             prediction_file_name = dir_name + 'Predictions/test/' + filename
             accuracy += evaluate_single_file(code_file_name,
                                              label_file_name, prediction_file_name, False)
-
+            # print("code_file_name", code_file_name)
+            # print("label_file_name", label_file_name)
+            # print("prediction_file_name", prediction_file_name)
+            # print('---------')
             count += 1
             # if verbose == True:
             # print('Accuracy for file ' + filename + ': ' + str(accuracy/count))
