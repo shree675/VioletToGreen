@@ -4,6 +4,7 @@
 VioletToGreen is a VS Code extension that helps in improving maintainability and understandability of your code.
 
 ## Abstract
+The aim of the project is to improve maintainability and understandability of the code by leveraging the comments written by the user. The tool is delivered in the form of a VS Code extension which helps the programmer maintain the readability on the fly. The tool had 2 main features i.e, linking the comments and code, and suggesting where to insert a commnet based on a custom readability metric. The linking of comments is done in both manual and automatic ways. For manual linking, appropriate UI has been implemented and these links will be stored in a file. For automatic linking, a few heuristic rules have been devised based on the commenting habits of a typical programmer keeping mind various cases possible including slighltly anomolous ones. For comment suggestion functionality, we are analysing various source code components (functions, blocks, loops, branchs, etc.) and predicting readability score. We use this readability score along with the code-to-comment ratio to decide whether a comment is needed or not, based on a threshold value for bith the metrics. Once the linking is done, in the future if the user edits a piece of code that is linked, the tool prompts the user to update the corresponding comment. This linking is also useful when a programmer is trying to understand a code base, in which case the tool helps the user to visualize exactly which part of the code is linked to which comment.
 
 ## Objectives
 
