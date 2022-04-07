@@ -145,8 +145,13 @@ export const runHeuristics = (javaText: string) => {
       .getText(new vscode.Selection(pos1, pos2))
       .toLocaleLowerCase();
 
+    // TODO!: Replace this by sending a request to the server and then
+    // determining if the comment is a code snippet or not
+    const isCode = Math.random() > 0.8;
+
     // if it is a multiline and single line comment
     if (
+      !isCode &&
       comment.type === parser?.enums.multiline ||
       comment.type === parser?.enums.singleLine
     ) {
