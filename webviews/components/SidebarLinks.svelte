@@ -103,8 +103,8 @@
           tsvscode.postMessage({
             type: "gotoLine",
             value: {
-              startLine: item[0].startLine,
-              endLine: item[0].endLine,
+              startLine: item[0].startLine - 1,
+              endLine: item[0].endLine - 1,
               startCharacter: item[0].startCharacter,
               endCharacter: item[0].endCharacter,
               filepath: item[0].filepath,
@@ -123,8 +123,8 @@
           tsvscode.postMessage({
             type: "gotoLine",
             value: {
-              startLine: item[1].startLine,
-              endLine: item[1].endLine,
+              startLine: item[1].startLine - 1,
+              endLine: item[1].endLine - 1,
               startCharacter: item[1].startCharacter,
               endCharacter: item[1].endCharacter,
               filepath: item[1].filepath,

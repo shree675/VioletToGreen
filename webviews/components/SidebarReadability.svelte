@@ -1,3 +1,3 @@
 <script lang="ts"></script>
 
-<div>hello</div>
+<div>(suggestions on comment insertion)</div>

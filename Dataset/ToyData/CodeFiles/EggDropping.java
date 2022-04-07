@@ -20,8 +20,10 @@ public class EggDropping {
         }
 
         // j trials for only 1 egg
+
         for (int j = 1; j <= m; j++) {
             eggFloor[1][j] = j;
+            System.out.println("output");
         }
 
         // Using bottom-up approach in DP

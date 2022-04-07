@@ -32,7 +32,7 @@ export class Metrics {
       //   console.log(`${s.name}`, s.location);
       // }
 
-      // if (s.location?.startLine >= 38 && s.location?.endLine <= 41) {
+      // if (s.location?.startLine >= 19 && s.location?.endLine <= 19) {
       //   console.log(`${s.name}`, s.location);
       // }
 
@@ -70,7 +70,7 @@ export class Metrics {
           this.interfaces.push(s.location);
           break;
         }
-        case "variableDeclarator": {
+        case "fieldDeclaration": {
           this.initAndDeclStatements.push(s.location);
           break;
         }
