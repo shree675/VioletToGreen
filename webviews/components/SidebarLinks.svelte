@@ -32,6 +32,7 @@
     startCharacter: string;
     endCharacter: string;
     filepath: string;
+    type: string;
   }) => {
     if (val.string.length >= 20) {
       return (
@@ -50,6 +51,7 @@
     startCharacter: string;
     endCharacter: string;
     filepath: string;
+    type: string;
   }) => {
     let str = "【" + val.startLine + " - " + val.endLine + "】";
     return str;
@@ -97,14 +99,14 @@
     </div>
     <div>
       <div
-        class="blue"
+        class="green"
         data-tooltip="Path: {formatPath(item[0].filepath)}"
         on:click={() => {
           tsvscode.postMessage({
             type: "gotoLine",
             value: {
-              startLine: item[0].startLine,
-              endLine: item[0].endLine,
+              startLine: item[0].startLine - 1,
+              endLine: item[0].endLine - 1,
               startCharacter: item[0].startCharacter,
               endCharacter: item[0].endCharacter,
               filepath: item[0].filepath,
@@ -117,14 +119,14 @@
         <i>{formatString(item[0])}</i>
       </div>
       <div
-        class="green"
+        class="blue"
         data-tooltip="Path: {formatPath(item[1].filepath)}"
         on:click={() => {
           tsvscode.postMessage({
             type: "gotoLine",
             value: {
-              startLine: item[1].startLine,
-              endLine: item[1].endLine,
+              startLine: item[1].startLine - 1,
+              endLine: item[1].endLine - 1,
               startCharacter: item[1].startCharacter,
               endCharacter: item[1].endCharacter,
               filepath: item[1].filepath,
@@ -145,12 +147,12 @@
     margin-bottom: 10px;
   }
   .blue {
-    background-color: rgba(0, 0, 255, 0.151);
+    background-color: rgb(146, 54, 238, 0.151);
     cursor: pointer;
     padding: 2px;
   }
   .green {
-    background-color: rgba(0, 255, 0, 0.151);
+    background-color: rgb(26, 204, 44, 0.2);
     cursor: pointer;
     padding: 2px;
   }
