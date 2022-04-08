@@ -40,7 +40,7 @@ export class SidebarLinksProvider implements vscode.WebviewViewProvider {
       decorationType.push(
         vscode.window.createTextEditorDecorationType({
           backgroundColor:
-            type === 0 ? "rgba(0, 0, 255, 0.2)" : "rgba(0, 255, 0, 0.2)",
+            type === 0 ? "rgb(26, 204, 44,0.2)" : "	rgb(146, 54, 238,0.2)",
           isWholeLine: false,
           rangeBehavior: vscode.DecorationRangeBehavior.ClosedClosed,
         })

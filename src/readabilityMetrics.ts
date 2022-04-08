@@ -16,7 +16,15 @@ export class Metrics {
   public caseBlocks: any = [];
 
   public getBlocks = (javaText: string) => {
-    const cst = parse(javaText);
+    var cst;
+    try {
+      cst = parse(javaText);
+    } catch (err) {
+      vscode.window.showErrorMessage(
+        "There is an error in the syntax of your Java file. Please check your Java file and try again."
+      );
+      return;
+    }
 
     let q = [cst];
     let curl = 1;

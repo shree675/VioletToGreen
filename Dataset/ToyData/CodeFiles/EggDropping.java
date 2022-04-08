@@ -79,7 +79,8 @@ public class EggDropping {
         int n = 2, m = 4;
         // result outputs min no. of trials in worst case for n eggs and m floors
         int result = minTrials(n, m);
-        System.out.println(result);
+        System.out.println(
+                "Minimum number of trials in worst case with " + n + " eggs and " + m + " floors is " + result);
     }
 
     // the above function is main function
