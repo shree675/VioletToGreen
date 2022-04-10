@@ -1,0 +1,82 @@
+[
+  [
+    {
+      "startLine": 3,
+      "startCharacter": 0,
+      "endLine": 7,
+      "endCharacter": 3,
+      "filepath": "d:\\books and documents\\6th semester\\SE Lab\\VioletToGreen\\Dataset\\ToyData\\CodeFiles\\Egg.java",
+      "string": "/**\r\n * DynamicProgramming solution for the Egg Dropping Puzzle\r\n * \r\n * \r\n */",
+      "type": "auto"
+    },
+    {
+      "startLine": 8,
+      "startCharacter": 0,
+      "endLine": 87,
+      "endCharacter": 0,
+      "filepath": "d:\\books and documents\\6th semester\\SE Lab\\VioletToGreen\\Dataset\\ToyData\\CodeFiles\\Egg.java",
+      "string": "public class EggDropping {\r\n\r\n    // min trials with n eggs and m floors\r\n\r\n    private static int minTrials(int n, int m) {\r\n\r\n        int[][] eggFloor = new int[n + 1][m + 1];\r\n        int result, x;\r\n\r\n        for (int i = 1; i <= n; i++) {\r\n            eggFloor[i][0] = 0; // Zero trial for zero floor.\r\n            eggFloor[i][1] = 1; // One trial for one floor\r\n        }\r\n\r\n        // j trials for only 1 egg\r\n\r\n        for (int j = 1; j <= m; j++) {\r\n            eggFloor[1][j] = j;\r\n            System.out.println(\"output\");\r\n        }\r\n\r\n        // Using bottom-up approach in DP\r\n        for (int i = 2; i <= n; i++) {\r\n            for (int j = 2; j <= m; j++) {\r\n                eggFloor[i][j] = Integer.MAX_VALUE;\r\n                for (x = 1; x <= j; x++) {\r\n                    result = 1 + Math.max(eggFloor[i - 1][x - 1], eggFloor[i][j - x]);\r\n\r\n                    // choose min of all values for particular x\r\n                    if (result < eggFloor[i][j]) {\r\n                        eggFloor[i][j] = result;\r\n                    } else if (a == b) { // the above equation\r\n                        System.out.println(\"a==b\");\r\n                    } else { // this is here\r\n                        System.out.println(\"a!=b\");\r\n                    }\r\n                }\r\n            }\r\n        }\r\n\r\n        // in here\r\n        switch (x) {\r\n            // no keyword\r\n            case 0:\r\n                // inside case\r\n                System.out.println(\"0\");\r\n                break;\r\n            case 1:\r\n                // inside no keyword\r\n                System.out.println(\"1\");\r\n                break;\r\n            // this case is here\r\n            default:\r\n                System.out.println(x);\r\n                break;\r\n        }\r\n\r\n        // hello\r\n        do {\r\n            System.out.println(\"x\");\r\n        } while (x == 0);\r\n        // the above loop\r\n\r\n        while (true) {\r\n            System.out.println(\"\");\r\n        }\r\n\r\n        return eggFloor[n][m];\r\n    }\r\n\r\n    public static void main(String args[]) {\r\n        int n = 2, m = 4;\r\n        // result outputs min no. of trials in worst case for n eggs and m floors\r\n        int result = minTrials(n, m);\r\n        System.out.println(\r\n                \"Minimum number of trials in worst case with \" + n + \" eggs and \" + m + \" floors is \" + result);\r\n    }\r\n\r\n    // the above function is main function\r\n",
+      "type": "auto"
+    }
+  ],
+  [
+    {
+      "startLine": 10,
+      "startCharacter": 4,
+      "endLine": 10,
+      "endCharacter": 42,
+      "filepath": "d:\\books and documents\\6th semester\\SE Lab\\VioletToGreen\\Dataset\\ToyData\\CodeFiles\\EggDropping.java",
+      "string": "// min trials with n eggs and m floors",
+      "type": "auto"
+    },
+    {
+      "startLine": 12,
+      "startCharacter": 4,
+      "endLine": 76,
+      "endCharacter": 4,
+      "filepath": "d:\\books and documents\\6th semester\\SE Lab\\VioletToGreen\\Dataset\\ToyData\\CodeFiles\\EggDropping.java",
+      "string": "private static int minTrials(int n, int m) {\r\n\r\n        int[][] eggFloor = new int[n + 1][m + 1];\r\n        int result, x;\r\n\r\n        for (int i = 1; i <= n; i++) {\r\n            eggFloor[i][0] = 0; // Zero trial for zero floor.\r\n            eggFloor[i][1] = 1; // One trial for one floor\r\n        }\r\n\r\n        // j trials for only 1 egg\r\n\r\n        for (int j = 1; j <= m; j++) {\r\n            eggFloor[1][j] = j;\r\n            System.out.println(\"output\");\r\n        }\r\n\r\n        // Using bottom-up approach in DP\r\n        for (int i = 2; i <= n; i++) {\r\n            for (int j = 2; j <= m; j++) {\r\n                eggFloor[i][j] = Integer.MAX_VALUE;\r\n                for (x = 1; x <= j; x++) {\r\n                    result = 1 + Math.max(eggFloor[i - 1][x - 1], eggFloor[i][j - x]);\r\n\r\n                    // choose min of all values for particular x\r\n                    if (result < eggFloor[i][j]) {\r\n                        eggFloor[i][j] = result;\r\n                    } else if (a == b) { // the above equation\r\n                        System.out.println(\"a==b\");\r\n                    } else { // this is here\r\n                        System.out.println(\"a!=b\");\r\n                    }\r\n                }\r\n            }\r\n        }\r\n\r\n        // in here\r\n        switch (x) {\r\n            // no keyword\r\n            case 0:\r\n                // inside case\r\n                System.out.println(\"0\");\r\n                break;\r\n            case 1:\r\n                // inside no keyword\r\n                System.out.println(\"1\");\r\n                break;\r\n            // this case is here\r\n            default:\r\n                System.out.println(x);\r\n                break;\r\n        }\r\n\r\n        // hello\r\n        do {\r\n            System.out.println(\"x\");\r\n        } while (x == 0);\r\n        // the above loop\r\n\r\n        while (true) {\r\n            System.out.println(\"\");\r\n        }\r\n\r\n        return eggFloor[n][m];\r\n    ",
+      "type": "auto"
+    }
+  ],
+  [
+    {
+      "startLine": 18,
+      "startCharacter": 32,
+      "endLine": 18,
+      "endCharacter": 61,
+      "filepath": "d:\\books and documents\\6th semester\\SE Lab\\VioletToGreen\\Dataset\\ToyData\\CodeFiles\\EggDropping.java",
+      "string": "// Zero trial for zero floor.",
+      "type": "auto"
+    },
+    {
+      "startLine": 18,
+      "startCharacter": 12,
+      "endLine": 18,
+      "endCharacter": 29,
+      "filepath": "d:\\books and documents\\6th semester\\SE Lab\\VioletToGreen\\Dataset\\ToyData\\CodeFiles\\EggDropping.java",
+      "string": "eggFloor[i][0] = ",
+      "type": "auto"
+    }
+  ],
+  [
+    {
+      "startLine": 19,
+      "startCharacter": 32,
+      "endLine": 19,
+      "endCharacter": 58,
+      "filepath": "d:\\books and documents\\6th semester\\SE Lab\\VioletToGreen\\Dataset\\ToyData\\CodeFiles\\EggDropping.java",
+      "string": "// One trial for one floor",
+      "type": "auto"
+    },
+    {
+      "startLine": 19,
+      "startCharacter": 12,
+      "endLine": 19,
+      "endCharacter": 29,
+      "filepath": "d:\\books and documents\\6th semester\\SE Lab\\VioletToGreen\\Dataset\\ToyData\\CodeFiles\\EggDropping.java",
+      "string": "eggFloor[i][1] = ",
+      "type": "auto"
+    }
+  ]
+]

@@ -5,7 +5,7 @@ import { SidebarSelectionProvider } from "./SidebarSelectionProvider";
 import { SidebarReadabilityProvider } from "./SidebarReadabilityProvider";
 import { SidebarLinksProvider } from "./SidebarLinksProvider";
 import { runHeuristics } from "./heuristics";
-import suggestComments from "./suggestComment";
+import suggestComments from "./suggestComments";
 
 const createFile = () => {
   var workspace = vscode.workspace?.workspaceFolders;
