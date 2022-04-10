@@ -24,6 +24,8 @@ export class SidebarLinksProvider implements vscode.WebviewViewProvider {
       "violettogreen.config.json"
     );
 
+    const root = vscode.workspace?.workspaceFolders![0].uri.fsPath;
+
     const decorate = (selection: any, decorationType: any, editor: any) => {
       const range = new vscode.Range(
         selection.startLine - 1,
@@ -40,7 +42,7 @@ export class SidebarLinksProvider implements vscode.WebviewViewProvider {
       decorationType.push(
         vscode.window.createTextEditorDecorationType({
           backgroundColor:
-            type === 0 ? "rgb(26, 204, 44,0.2)" : "	rgb(146, 54, 238,0.2)",
+            type === 0 ? "rgb(26, 204, 44, 0.24)" : "	rgb(146, 54, 238, 0.08)",
           isWholeLine: false,
           rangeBehavior: vscode.DecorationRangeBehavior.ClosedClosed,
         })
@@ -70,7 +72,10 @@ export class SidebarLinksProvider implements vscode.WebviewViewProvider {
           (cursor?.line! + 1 === range[1].endLine &&
             cursor?.character! <= range[1].endCharacter)
         ) {
-          const filepath = vscode.window.activeTextEditor?.document.fileName;
+          const filepath = path.relative(
+            root,
+            vscode.window.activeTextEditor?.document.fileName
+          );
           if (filepath === range[0].filepath) {
             createDecoration(0);
             decorate(
@@ -136,7 +141,10 @@ export class SidebarLinksProvider implements vscode.WebviewViewProvider {
 
     vscode.workspace.onDidChangeTextDocument((event) => {
       var cursor = vscode.window.activeTextEditor?.selection.active;
-      const filepath = vscode.window.activeTextEditor?.document.fileName;
+      const filepath = path.resolve(
+        root,
+        vscode.window.activeTextEditor?.document.fileName
+      );
       if (event.contentChanges[0].text.match(/\n/g) !== null) {
         for (var i = 0; i < arrayRange.length; i++) {
           if (
@@ -249,7 +257,9 @@ export class SidebarLinksProvider implements vscode.WebviewViewProvider {
           break;
         }
         case "gotoLine": {
-          var openFile = vscode.Uri.file(data.value.filepath);
+          var openFile = vscode.Uri.file(
+            path.resolve(root, data.value.filepath)
+          );
           vscode.workspace.openTextDocument(openFile).then((doc) => {
             vscode.window
               .showTextDocument(
