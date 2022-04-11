@@ -185,13 +185,17 @@ export function activate(context: vscode.ExtensionContext) {
     //   );
     // });
 
-    const autoLinks = runHeuristics(javaText!, editor?.document.uri.fsPath!);
-    var manualLinks: any[] = [];
     const workspace = vscode.workspace?.workspaceFolders;
     var filepath = path.join(
       workspace![0].uri.fsPath,
       "violettogreen.config.json"
     );
+    const root = workspace![0].uri.fsPath;
+    const autoLinks = runHeuristics(
+      javaText!,
+      path.relative(root, vscode.window.activeTextEditor?.document.fileName)
+    );
+    var manualLinks: any[] = [];
 
     fs.readFile(filepath, "utf-8", function (err: any, content: any) {
       if (err) {
