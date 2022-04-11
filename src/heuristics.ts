@@ -411,17 +411,25 @@ export const runHeuristics = (javaText: string, uri: string) => {
           if (notContainsKeyword(nextNonEmpty, comment, codeSampler.forLoops)) {
             continue findLinks;
           }
-          if (notContainsKeyword(nextNonEmpty, comment, codeSampler.whileLoops)) {
+          if (
+            notContainsKeyword(nextNonEmpty, comment, codeSampler.whileLoops)
+          ) {
             continue findLinks;
           }
-          if (notContainsKeyword(nextNonEmpty, comment, codeSampler.doStatements)) {
+          if (
+            notContainsKeyword(nextNonEmpty, comment, codeSampler.doStatements)
+          ) {
             continue findLinks;
           }
         }
 
         // third link it if the next line is a conditional statement
         if (
-          notContainsKeyword(nextNonEmpty, comment, codeSampler.ifElseStatements)
+          notContainsKeyword(
+            nextNonEmpty,
+            comment,
+            codeSampler.ifElseStatements
+          )
         ) {
           continue findLinks;
         }
@@ -430,7 +438,11 @@ export const runHeuristics = (javaText: string, uri: string) => {
         }
         // third link it if the next line is a conditional statement
         if (
-          notContainsKeyword(nextNonEmpty, comment, codeSampler.switchStatements)
+          notContainsKeyword(
+            nextNonEmpty,
+            comment,
+            codeSampler.switchStatements
+          )
         ) {
           continue findLinks;
         }
@@ -615,12 +627,16 @@ export const runHeuristics = (javaText: string, uri: string) => {
     } else {
       if (!commentText?.includes("above")) {
         // if the current line is a declaration statement
-        if (notContainsKeywordInline(comment, codeSampler.initAndDeclStatements)) {
+        if (
+          notContainsKeywordInline(comment, codeSampler.initAndDeclStatements)
+        ) {
           continue findLinks;
         }
 
         // if the current line is an assignment statement
-        if (notContainsKeywordInline(comment, codeSampler.assignmentStatements)) {
+        if (
+          notContainsKeywordInline(comment, codeSampler.assignmentStatements)
+        ) {
           continue findLinks;
         }
 
@@ -631,73 +647,73 @@ export const runHeuristics = (javaText: string, uri: string) => {
       }
     }
   }
-  // var annotations: string = "";
-  // for (var i = 0; i < links.length; i++) {
-  //   annotations +=
-  //     links[i][0].startLine +
-  //     "," +
-  //     links[i][0].startCharacter +
-  //     "," +
-  //     links[i][0].endLine +
-  //     "," +
-  //     links[i][0].endCharacter +
-  //     "," +
-  //     links[i][1].startLine +
-  //     "," +
-  //     links[i][1].startCharacter +
-  //     "," +
-  //     links[i][1].endLine +
-  //     "," +
-  //     links[i][1].endCharacter +
-  //     " ``\n";
-  // }
-  // return annotations;
-  var autoLinks = [];
-  var pos1, pos2, selectionString1, selectionString2;
+  var annotations: string = "";
   for (var i = 0; i < links.length; i++) {
-    pos1 = new vscode.Position(
-      links[i][0].startLine - 1,
-      Math.max(links[i][0].startCharacter - 1, 0)
-    );
-    pos2 = new vscode.Position(
-      links[i][0].endLine - 1,
-      Math.max(links[i][0].endCharacter - 1, 0)
-    );
-    selectionString1 = editor?.document.getText(
-      new vscode.Selection(pos1, pos2)
-    );
-
-    pos1 = new vscode.Position(
-      links[i][1].startLine - 1,
-      Math.max(links[i][1].startCharacter - 1, 0)
-    );
-    pos2 = new vscode.Position(
-      links[i][1].endLine - 1,
-      Math.max(links[i][1].endCharacter - 1, 0)
-    );
-    selectionString2 = editor?.document.getText(
-      new vscode.Selection(pos1, pos2)
-    );
-    autoLinks.push([
-      {
-        startLine: links[i][0].startLine,
-        startCharacter: Math.max(0, links[i][0].startCharacter - 1),
-        endLine: links[i][0].endLine,
-        endCharacter: Math.max(0, links[i][0].endCharacter - 1),
-        filepath: uri,
-        string: selectionString1,
-        type: "auto",
-      },
-      {
-        startLine: links[i][1].startLine,
-        startCharacter: Math.max(0, links[i][1].startCharacter - 1),
-        endLine: links[i][1].endLine,
-        endCharacter: Math.max(0, links[i][1].endCharacter - 1),
-        filepath: uri,
-        string: selectionString2,
-        type: "auto",
-      },
-    ]);
+    annotations +=
+      links[i][0].startLine +
+      "," +
+      links[i][0].startCharacter +
+      "," +
+      links[i][0].endLine +
+      "," +
+      links[i][0].endCharacter +
+      "," +
+      links[i][1].startLine +
+      "," +
+      links[i][1].startCharacter +
+      "," +
+      links[i][1].endLine +
+      "," +
+      links[i][1].endCharacter +
+      " ``\n";
   }
-  return autoLinks;
+  return annotations;
+  // var autoLinks = [];
+  // var pos1, pos2, selectionString1, selectionString2;
+  // for (var i = 0; i < links.length; i++) {
+  //   pos1 = new vscode.Position(
+  //     links[i][0].startLine - 1,
+  //     Math.max(links[i][0].startCharacter - 1, 0)
+  //   );
+  //   pos2 = new vscode.Position(
+  //     links[i][0].endLine - 1,
+  //     Math.max(links[i][0].endCharacter - 1, 0)
+  //   );
+  //   selectionString1 = editor?.document.getText(
+  //     new vscode.Selection(pos1, pos2)
+  //   );
+
+  //   pos1 = new vscode.Position(
+  //     links[i][1].startLine - 1,
+  //     Math.max(links[i][1].startCharacter - 1, 0)
+  //   );
+  //   pos2 = new vscode.Position(
+  //     links[i][1].endLine - 1,
+  //     Math.max(links[i][1].endCharacter - 1, 0)
+  //   );
+  //   selectionString2 = editor?.document.getText(
+  //     new vscode.Selection(pos1, pos2)
+  //   );
+  //   autoLinks.push([
+  //     {
+  //       startLine: links[i][0].startLine,
+  //       startCharacter: Math.max(0, links[i][0].startCharacter - 1),
+  //       endLine: links[i][0].endLine,
+  //       endCharacter: Math.max(0, links[i][0].endCharacter - 1),
+  //       filepath: uri,
+  //       string: selectionString1,
+  //       type: "auto",
+  //     },
+  //     {
+  //       startLine: links[i][1].startLine,
+  //       startCharacter: Math.max(0, links[i][1].startCharacter - 1),
+  //       endLine: links[i][1].endLine,
+  //       endCharacter: Math.max(0, links[i][1].endCharacter - 1),
+  //       filepath: uri,
+  //       string: selectionString2,
+  //       type: "auto",
+  //     },
+  //   ]);
+  // }
+  // return autoLinks;
 };
