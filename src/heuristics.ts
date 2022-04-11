@@ -698,6 +698,7 @@ export const runHeuristics = (javaText: string, uri: string) => {
         type: "auto",
       },
     ]);
+    console.log(autoLinks);
   }
   return autoLinks;
 };
