@@ -1,4 +1,5 @@
 import * as vscode from "vscode";
+import axios from "axios";
 
 // types of comments
 enum CommentType {

@@ -1671,4 +1671,5 @@ public abstract class BarLineChartBase<T extends BarLineScatterCandleBubbleData<
             mViewPortHandler.refresh(mViewPortHandler.getMatrixTouch(), this, true);
         }
     }
+
 }
