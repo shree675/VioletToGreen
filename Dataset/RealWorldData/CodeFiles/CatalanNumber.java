@@ -26,12 +26,12 @@ public class CatalanNumber {
         // Array to store the results of subproblems i.e Catalan numbers from [1...n-1]
         long catalanArray[] = new long[n + 1];
 
-        // Initialising C₀ = 1 and C₁ = 1 
+        // Initialising C0 = 1 and C1 = 1 
         catalanArray[0] = 1;
         catalanArray[1] = 1;
 
         /**
-         * The Catalan numbers satisfy the recurrence relation C₀=1 and Cn = Σ
+         * The Catalan numbers satisfy the recurrence relation C0=1 and Cn = sigma
          * (Ci * Cn-1-i), i = 0 to n-1 , n > 0
          */
         for (int i = 2; i <= n; i++) {

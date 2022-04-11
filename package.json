@@ -39,9 +39,9 @@
         {
           "type": "webview",
           "id": "violet-to-green-readability",
-          "name": "Readability Metrics",
+          "name": "Suggestions: Insert Comment",
           "icon": "media/checklist.svg",
-          "contextualTitle": "Readability Metrics"
+          "contextualTitle": "Suggestions: Insert Comment"
         },
         {
           "type": "webview",

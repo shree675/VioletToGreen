@@ -13,6 +13,7 @@
     startCharacter: string;
     endCharacter: string;
     filepath: string;
+    type: string;
   }) => {
     let str = "【" + (val.startLine + 1) + " - " + (val.endLine + 1) + "】";
     if (val.string.length >= 20) {
@@ -99,6 +100,7 @@
               startCharacter: rawText1.startCharacter + 1,
               endCharacter: rawText1.endCharacter + 1,
               filepath: rawText1.filepath,
+              type: "manual",
             },
             {
               startLine: rawText2.startLine + 1,
@@ -107,6 +109,7 @@
               startCharacter: rawText2.startCharacter + 1,
               endCharacter: rawText2.endCharacter + 1,
               filepath: rawText2.filepath,
+              type: "manual",
             },
           ];
           tsvscode.postMessage({

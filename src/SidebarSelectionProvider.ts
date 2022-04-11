@@ -28,6 +28,8 @@ export class SidebarSelectionProvider implements vscode.WebviewViewProvider {
       "violettogreen.config.json"
     );
 
+    const root = vscode.workspace?.workspaceFolders![0].uri.fsPath;
+
     webviewView.webview.onDidReceiveMessage((data: any) => {
       switch (data.type) {
         case "info": {
@@ -53,9 +55,16 @@ export class SidebarSelectionProvider implements vscode.WebviewViewProvider {
               string: selectionString,
               startLine: editor?.selection.start.line,
               endLine: editor?.selection.end.line,
-              startCharacter: editor?.selection.start.character,
-              endCharacter: editor?.selection.end.character,
-              filepath: vscode.window.activeTextEditor?.document.fileName,
+              startCharacter: Math.max(
+                0,
+                editor?.selection.start.character! - 1
+              ),
+              endCharacter: Math.max(0, editor?.selection.end.character! - 1),
+              filepath: path.relative(
+                root,
+                vscode.window.activeTextEditor?.document.fileName
+              ),
+              type: "manual",
             },
           });
           break;
