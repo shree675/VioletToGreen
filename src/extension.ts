@@ -224,7 +224,7 @@ export function activate(context: vscode.ExtensionContext) {
     });
   });
 
-  vscode.commands.registerCommand("violet-to-green.suggestComments", () => {
+  vscode.commands.registerCommand("violet-to-green.suggestComments", async () => {
     const editor = vscode.window.activeTextEditor;
 
     const javaText = editor?.document.getText();
@@ -237,7 +237,8 @@ export function activate(context: vscode.ExtensionContext) {
       workspace[0].uri.fsPath,
       "violettogreen.config.json"
     );
-    suggestComments(javaText!, editor?.document.uri.fsPath!, filepath!);
+    const root = vscode.workspace?.workspaceFolders![0].uri.fsPath;
+    await suggestComments(javaText!, path.relative(root, editor?.document.uri.fsPath!), path.relative(root, filepath!), root);
 
   });
 }
