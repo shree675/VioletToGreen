@@ -1,30 +1,30 @@
 import * as vscode from "vscode";
 import { linkComments } from "./parser";
-import { Metrics } from "./readabilityMetrics";
+import { CodeSampler } from "./codeSampler";
 
 export const runHeuristics = (javaText: string, uri: string) => {
   const parser = linkComments(javaText);
-  const metrics = new Metrics();
+  const codeSampler = new CodeSampler();
   const editor = vscode.window.activeTextEditor;
   var links = [];
   var keywordsArray: string[] = [];
 
-  metrics.getBlocks(javaText);
+  codeSampler.getBlocks(javaText);
 
   const containsKeyword = (
     keywords: string[],
     comment: any,
     commentText: string,
-    metricsArray: any,
+    codeSamplerArray: any,
     nextNonEmpty: any
   ) => {
     for (const keyword of keywords) {
       if (commentText.includes(keyword)) {
-        for (var i = 0; i < metricsArray.length; i++) {
-          if (metricsArray[i].startLine === nextNonEmpty) {
+        for (var i = 0; i < codeSamplerArray.length; i++) {
+          if (codeSamplerArray[i].startLine === nextNonEmpty) {
             links.push([
               convertToObject(comment),
-              convertToObject(metricsArray[i]),
+              convertToObject(codeSamplerArray[i]),
             ]);
             return true;
           }
@@ -38,16 +38,16 @@ export const runHeuristics = (javaText: string, uri: string) => {
     keywords: string[],
     comment: any,
     commentText: string,
-    metricsArray: any,
+    codeSamplerArray: any,
     prevNonEmpty: any
   ) => {
     for (const keyword of keywords) {
       if (commentText.includes(keyword)) {
-        for (var i = metricsArray.length - 1; i >= 0; i--) {
-          if (metricsArray[i].endLine === prevNonEmpty) {
+        for (var i = codeSamplerArray.length - 1; i >= 0; i--) {
+          if (codeSamplerArray[i].endLine === prevNonEmpty) {
             links.push([
               convertToObject(comment),
-              convertToObject(metricsArray[i]),
+              convertToObject(codeSamplerArray[i]),
             ]);
             return true;
           }
@@ -60,13 +60,13 @@ export const runHeuristics = (javaText: string, uri: string) => {
   const notContainsKeyword = (
     nextNonEmpty: any,
     comment: any,
-    metricsArray: any
+    codeSamplerArray: any
   ) => {
-    for (var i = 0; i < metricsArray.length; i++) {
-      if (metricsArray[i].startLine === nextNonEmpty) {
+    for (var i = 0; i < codeSamplerArray.length; i++) {
+      if (codeSamplerArray[i].startLine === nextNonEmpty) {
         links.push([
           convertToObject(comment),
-          convertToObject(metricsArray[i]),
+          convertToObject(codeSamplerArray[i]),
         ]);
         return true;
       }
@@ -74,12 +74,12 @@ export const runHeuristics = (javaText: string, uri: string) => {
     return false;
   };
 
-  const notContainsKeywordInline = (comment: any, metricsArray: any) => {
-    for (var i = 0; i < metricsArray.length; i++) {
-      if (metricsArray[i].startLine === comment.startLine) {
+  const notContainsKeywordInline = (comment: any, codeSamplerArray: any) => {
+    for (var i = 0; i < codeSamplerArray.length; i++) {
+      if (codeSamplerArray[i].startLine === comment.startLine) {
         links.push([
           convertToObject(comment),
-          convertToObject(metricsArray[i]),
+          convertToObject(codeSamplerArray[i]),
         ]);
         return true;
       }
@@ -91,16 +91,16 @@ export const runHeuristics = (javaText: string, uri: string) => {
     keywords: any,
     comment: any,
     commentText: string,
-    metricsArray: any,
+    codeSamplerArray: any,
     prevNonEmpty: any
   ) => {
     for (const keyword of keywords) {
       if (commentText.includes(keyword)) {
-        for (var i = 0; i < metricsArray.length; i++) {
-          if (metricsArray[i].startLine === prevNonEmpty) {
+        for (var i = 0; i < codeSamplerArray.length; i++) {
+          if (codeSamplerArray[i].startLine === prevNonEmpty) {
             links.push([
               convertToObject(comment),
-              convertToObject(metricsArray[i]),
+              convertToObject(codeSamplerArray[i]),
             ]);
             return true;
           }
@@ -161,7 +161,7 @@ export const runHeuristics = (javaText: string, uri: string) => {
             keywordsArray,
             comment,
             commentText!,
-            metrics.classes,
+            codeSampler.classes,
             nextNonEmpty
           )
         ) {
@@ -174,7 +174,7 @@ export const runHeuristics = (javaText: string, uri: string) => {
             keywordsArray,
             comment,
             commentText!,
-            metrics.interfaces,
+            codeSampler.interfaces,
             nextNonEmpty
           )
         ) {
@@ -210,7 +210,7 @@ export const runHeuristics = (javaText: string, uri: string) => {
               keywordsArray,
               comment,
               commentText!,
-              metrics.methods,
+              codeSampler.methods,
               nextNonEmpty
             )
           ) {
@@ -222,7 +222,7 @@ export const runHeuristics = (javaText: string, uri: string) => {
               keywordsArray,
               comment,
               commentText!,
-              metrics.methods,
+              codeSampler.methods,
               prevNonEmpty
             )
           ) {
@@ -242,11 +242,11 @@ export const runHeuristics = (javaText: string, uri: string) => {
               break;
             }
           }
-          for (var i = 0; i < metrics.methods.length; i++) {
-            if (metrics.methods[i].startLine === tempNextLine) {
+          for (var i = 0; i < codeSampler.methods.length; i++) {
+            if (codeSampler.methods[i].startLine === tempNextLine) {
               links.push([
                 convertToObject(comment),
-                convertToObject(metrics.methods[i]),
+                convertToObject(codeSampler.methods[i]),
               ]);
               continue findLinks;
             }
@@ -273,7 +273,7 @@ export const runHeuristics = (javaText: string, uri: string) => {
               keywordsArray,
               comment,
               commentText!,
-              metrics.forLoops,
+              codeSampler.forLoops,
               nextNonEmpty
             )
           ) {
@@ -284,7 +284,7 @@ export const runHeuristics = (javaText: string, uri: string) => {
               keywordsArray,
               comment,
               commentText!,
-              metrics.whileLoops,
+              codeSampler.whileLoops,
               nextNonEmpty
             )
           ) {
@@ -295,7 +295,7 @@ export const runHeuristics = (javaText: string, uri: string) => {
               keywordsArray,
               comment,
               commentText!,
-              metrics.doStatements,
+              codeSampler.doStatements,
               nextNonEmpty
             )
           ) {
@@ -307,7 +307,7 @@ export const runHeuristics = (javaText: string, uri: string) => {
               keywordsArray,
               comment,
               commentText!,
-              metrics.forLoops,
+              codeSampler.forLoops,
               prevNonEmpty
             )
           ) {
@@ -318,7 +318,7 @@ export const runHeuristics = (javaText: string, uri: string) => {
               keywordsArray,
               comment,
               commentText!,
-              metrics.whileLoops,
+              codeSampler.whileLoops,
               prevNonEmpty
             )
           ) {
@@ -329,7 +329,7 @@ export const runHeuristics = (javaText: string, uri: string) => {
               keywordsArray,
               comment,
               commentText!,
-              metrics.doStatements,
+              codeSampler.doStatements,
               prevNonEmpty
             )
           ) {
@@ -344,7 +344,7 @@ export const runHeuristics = (javaText: string, uri: string) => {
             keywordsArray,
             comment,
             commentText!,
-            metrics.switchStatements,
+            codeSampler.switchStatements,
             nextNonEmpty
           )
         ) {
@@ -358,7 +358,7 @@ export const runHeuristics = (javaText: string, uri: string) => {
             keywordsArray,
             comment,
             commentText!,
-            metrics.caseBlocks,
+            codeSampler.caseBlocks,
             nextNonEmpty
           )
         ) {
@@ -381,7 +381,7 @@ export const runHeuristics = (javaText: string, uri: string) => {
             keywordsArray,
             comment,
             commentText!,
-            metrics.ifElseStatements,
+            codeSampler.ifElseStatements,
             nextNonEmpty
           )
         ) {
@@ -390,47 +390,47 @@ export const runHeuristics = (javaText: string, uri: string) => {
 
         // if the above condition is not satisfied
         // if next line is a class declaration
-        if (notContainsKeyword(nextNonEmpty, comment, metrics.classes)) {
+        if (notContainsKeyword(nextNonEmpty, comment, codeSampler.classes)) {
           continue findLinks;
         }
 
         // if next line is an interface declaration
-        if (notContainsKeyword(nextNonEmpty, comment, metrics.interfaces)) {
+        if (notContainsKeyword(nextNonEmpty, comment, codeSampler.interfaces)) {
           continue findLinks;
         }
 
         // first link it if the next line is a function
         if (!commentText?.includes("above")) {
-          if (notContainsKeyword(nextNonEmpty, comment, metrics.methods)) {
+          if (notContainsKeyword(nextNonEmpty, comment, codeSampler.methods)) {
             continue findLinks;
           }
         }
 
         // second link it if the next line is a loop statement
         if (!commentText?.includes("above")) {
-          if (notContainsKeyword(nextNonEmpty, comment, metrics.forLoops)) {
+          if (notContainsKeyword(nextNonEmpty, comment, codeSampler.forLoops)) {
             continue findLinks;
           }
-          if (notContainsKeyword(nextNonEmpty, comment, metrics.whileLoops)) {
+          if (notContainsKeyword(nextNonEmpty, comment, codeSampler.whileLoops)) {
             continue findLinks;
           }
-          if (notContainsKeyword(nextNonEmpty, comment, metrics.doStatements)) {
+          if (notContainsKeyword(nextNonEmpty, comment, codeSampler.doStatements)) {
             continue findLinks;
           }
         }
 
         // third link it if the next line is a conditional statement
         if (
-          notContainsKeyword(nextNonEmpty, comment, metrics.ifElseStatements)
+          notContainsKeyword(nextNonEmpty, comment, codeSampler.ifElseStatements)
         ) {
           continue findLinks;
         }
-        if (notContainsKeyword(nextNonEmpty, comment, metrics.caseBlocks)) {
+        if (notContainsKeyword(nextNonEmpty, comment, codeSampler.caseBlocks)) {
           continue findLinks;
         }
         // third link it if the next line is a conditional statement
         if (
-          notContainsKeyword(nextNonEmpty, comment, metrics.switchStatements)
+          notContainsKeyword(nextNonEmpty, comment, codeSampler.switchStatements)
         ) {
           continue findLinks;
         }
@@ -440,7 +440,7 @@ export const runHeuristics = (javaText: string, uri: string) => {
           notContainsKeyword(
             nextNonEmpty,
             comment,
-            metrics.initAndDeclStatements
+            codeSampler.initAndDeclStatements
           )
         ) {
           continue findLinks;
@@ -449,7 +449,7 @@ export const runHeuristics = (javaText: string, uri: string) => {
           notContainsKeyword(
             nextNonEmpty,
             comment,
-            metrics.assignmentStatements
+            codeSampler.assignmentStatements
           )
         ) {
           continue findLinks;
@@ -472,7 +472,7 @@ export const runHeuristics = (javaText: string, uri: string) => {
             keywordsArray,
             comment,
             commentText!,
-            metrics.initAndDeclStatements,
+            codeSampler.initAndDeclStatements,
             nextNonEmpty
           )
         ) {
@@ -494,7 +494,7 @@ export const runHeuristics = (javaText: string, uri: string) => {
             keywordsArray,
             comment,
             commentText!,
-            metrics.assignmentStatements,
+            codeSampler.assignmentStatements,
             nextNonEmpty
           )
         ) {
@@ -529,7 +529,7 @@ export const runHeuristics = (javaText: string, uri: string) => {
             keywordsArray,
             comment,
             commentText!,
-            metrics.methods,
+            codeSampler.methods,
             prevNonEmpty
           )
         ) {
@@ -554,21 +554,21 @@ export const runHeuristics = (javaText: string, uri: string) => {
             keywordsArray,
             comment,
             commentText!,
-            metrics.forLoops,
+            codeSampler.forLoops,
             prevNonEmpty
           ) ||
           containsKeywordInside(
             keywordsArray,
             comment,
             commentText!,
-            metrics.whileLoops,
+            codeSampler.whileLoops,
             prevNonEmpty
           ) ||
           containsKeywordInside(
             keywordsArray,
             comment,
             commentText!,
-            metrics.doStatements,
+            codeSampler.doStatements,
             prevNonEmpty
           )
         ) {
@@ -591,7 +591,7 @@ export const runHeuristics = (javaText: string, uri: string) => {
             keywordsArray,
             comment,
             commentText!,
-            metrics.ifElseStatements,
+            codeSampler.ifElseStatements,
             prevNonEmpty
           )
         ) {
@@ -605,7 +605,7 @@ export const runHeuristics = (javaText: string, uri: string) => {
             keywordsArray,
             comment,
             commentText!,
-            metrics.caseBlocks,
+            codeSampler.caseBlocks,
             prevNonEmpty
           )
         ) {
@@ -615,17 +615,17 @@ export const runHeuristics = (javaText: string, uri: string) => {
     } else {
       if (!commentText?.includes("above")) {
         // if the current line is a declaration statement
-        if (notContainsKeywordInline(comment, metrics.initAndDeclStatements)) {
+        if (notContainsKeywordInline(comment, codeSampler.initAndDeclStatements)) {
           continue findLinks;
         }
 
         // if the current line is an assignment statement
-        if (notContainsKeywordInline(comment, metrics.assignmentStatements)) {
+        if (notContainsKeywordInline(comment, codeSampler.assignmentStatements)) {
           continue findLinks;
         }
 
         // if the current line is an if, else if or else statement
-        if (notContainsKeywordInline(comment, metrics.ifElseStatements)) {
+        if (notContainsKeywordInline(comment, codeSampler.ifElseStatements)) {
           continue findLinks;
         }
       }

@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 const { parse } = require("java-parser");
 
-export class Metrics {
+export class CodeSampler {
   public methods: any = [];
   public classes: any = [];
   public interfaces: any = [];

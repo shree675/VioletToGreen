@@ -5,6 +5,7 @@ import { SidebarSelectionProvider } from "./SidebarSelectionProvider";
 import { SidebarReadabilityProvider } from "./SidebarReadabilityProvider";
 import { SidebarLinksProvider } from "./SidebarLinksProvider";
 import { runHeuristics } from "./heuristics";
+import suggestComments from "./suggestComment";
 
 const createFile = () => {
   var workspace = vscode.workspace?.workspaceFolders;
@@ -222,6 +223,25 @@ export function activate(context: vscode.ExtensionContext) {
       });
     });
   });
+
+  vscode.commands.registerCommand("violet-to-green.suggestComments", () => {
+    const editor = vscode.window.activeTextEditor;
+
+    const javaText = editor?.document.getText();
+    var workspace = vscode.workspace?.workspaceFolders;
+    if (workspace === null || workspace === undefined) {
+      vscode.window.showErrorMessage("No workspace found");
+      return;
+    }
+    var filepath = path.join(
+      workspace[0].uri.fsPath,
+      "violettogreen.config.json"
+    );
+    suggestComments(javaText!, editor?.document.uri.fsPath!, filepath!);
+
+  });
 }
+
+
 
 export function deactivate() {}
