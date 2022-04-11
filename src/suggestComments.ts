@@ -1,11 +1,10 @@
 //import { runHeuristics } from "./heuristics";
 
 import { config } from "process";
-import axios from 'axios';
+import axios from "axios";
 
 const fs = require("fs");
 const path = require("path");
-
 
 async function suggestComments(javaText: string, uri: string, configPath: string, root: string) {
    
@@ -45,8 +44,6 @@ async function suggestComments(javaText: string, uri: string, configPath: string
     //console.log(configFile);
     //links = 
 }
-
-
 
 
 export default suggestComments;
