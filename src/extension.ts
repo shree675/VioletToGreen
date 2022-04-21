@@ -5,6 +5,7 @@ import { SidebarSelectionProvider } from "./SidebarSelectionProvider";
 import { SidebarReadabilityProvider } from "./SidebarReadabilityProvider";
 import { SidebarLinksProvider } from "./SidebarLinksProvider";
 import { runHeuristics } from "./heuristics";
+import suggestComments from "./suggestComments";
 // import suggestComments from "./suggestComments";
 
 const createFile = () => {
