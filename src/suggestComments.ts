@@ -4,10 +4,19 @@ import { config } from "process";
 import axios from "axios";
 
 const fs = require("fs");
-// //const path = require("path");
+const path = require("path");
 
-function suggestComments(javaText: string, uri: string, configPath: string) {
+async function suggestComments(
+  javaText: string,
+  uri: string,
+  configPath: string,
+  root: string
+) {
   console.log("Hello from suggestComments");
+  console.log("javatext", javaText);
+  console.log("uri", uri);
+  console.log("configOut", configPath);
+  configPath = path.resolve(root, configPath);
 
   var lines: string;
   var configFile: any;
@@ -25,39 +34,22 @@ function suggestComments(javaText: string, uri: string, configPath: string) {
       configOut.push(configFile[i]);
     }
   }
-  return configOut;
+
+  var payload = {
+    code: javaText,
+    configs: configOut,
+  };
+  console.log(payload);
+
+  await axios
+    .post("http://localhost:3000/suggest_comments", payload)
+    .then((response) => {
+      console.log(response);
+    });
+
+  return "nothing yet";
   //console.log(configFile);
   //links =
 }
-
-// TODO : get the JAVA text from the active editor
-var filepath = "../Dataset/ToyData/CodeFiles/EggDropping.java";
-var javaText: string = "";
-(async () => {
-  javaText = fs.readFileSync(filepath).toString();
-  console.log("Javatext", javaText);
-  //javaText = lines;
-})();
-
-//var javaText =
-//  "public class BubbleSortExample { static void bubbleSort(int[] arr) {  int n = arr.length; int temp = 0;  for(int i=0; i < n; i++){  for(int j=1; j < (n-i); j++){  if(arr[j-1] > arr[j]){  temp = arr[j-1];  arr[j-1] = arr[j];  arr[j] = temp;}}}}}";
-
-//__dirname +
-var uri = "../Dataset/ToyData/CodeFiles/EggDropping.java";
-//var uri =
-//"d:\\books and documents\\6th semester\\SE Lab\\VioletToGreen\\Dataset\\ToyData\\CodeFiles\\EggDropping.java";
-var configPath = "./violettogreen.config.json";
-var configOut = suggestComments(javaText, uri, configPath);
-var payload = {
-  code: javaText,
-  configs: configOut,
-};
-console.log(payload);
-
-axios
-  .post("http://localhost:3000/suggest_comments", payload)
-  .then((response) => {
-    console.log(response.data);
-  });
 
 export default suggestComments;
