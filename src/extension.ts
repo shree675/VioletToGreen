@@ -147,81 +147,81 @@ export function activate(context: vscode.ExtensionContext) {
   vscode.commands.registerCommand("violet-to-green.linkAutomatically", () => {
     const editor = vscode.window.activeTextEditor;
     const javaText = editor?.document.getText();
-    const filesPath = path.resolve(
-      __dirname,
-      "..",
-      "Dataset",
-      "RealWorldData",
-      "CodeFiles"
-    );
-    const outputPath = path.join(
-      __dirname,
-      "..",
-      "Dataset",
-      "RealWorldData",
-      "Predictions"
-    );
-    // var filesLimit = 1;
-    var predictions: string;
-
-    fs.readdirSync(filesPath).forEach(function (filename: string) {
-      fs.readFile(
-        path.join(filesPath, filename),
-        "utf-8",
-        function (err: any, content: any) {
-          if (err) {
-            vscode.window.showErrorMessage(err);
-            return;
-          }
-          predictions = runHeuristics(content, "");
-          fs.writeFile(
-            path.join(outputPath, filename.split(".")[0] + ".txt"),
-            predictions,
-            (err: any) => {
-              vscode.window.showErrorMessage(err);
-            }
-          );
-        }
-      );
-    });
-
-    // const workspace = vscode.workspace?.workspaceFolders;
-    // var filepath = path.join(
-    //   workspace![0].uri.fsPath,
-    //   "violettogreen.config.json"
+    // const filesPath = path.resolve(
+    //   __dirname,
+    //   "..",
+    //   "Dataset",
+    //   "RealWorldData",
+    //   "CodeFiles"
     // );
-    // const root = workspace![0].uri.fsPath;
-    // const autoLinks = runHeuristics(
-    //   javaText!,
-    //   path.relative(root, vscode.window.activeTextEditor?.document.fileName)
+    // const outputPath = path.join(
+    //   __dirname,
+    //   "..",
+    //   "Dataset",
+    //   "RealWorldData",
+    //   "Predictions"
     // );
-    // var manualLinks: any[] = [];
+    // // var filesLimit = 1;
+    // var predictions: string;
 
-    // fs.readFile(filepath, "utf-8", function (err: any, content: any) {
-    //   if (err) {
-    //     vscode.window.showErrorMessage(err);
-    //     return;
-    //   }
-    //   const json = JSON.parse(content);
-
-    //   for (var i = 0; i < json.length; i++) {
-    //     if (json[i][0].type === "manual") {
-    //       manualLinks.push(json[i]);
+    // fs.readdirSync(filesPath).forEach(function (filename: string) {
+    //   fs.readFile(
+    //     path.join(filesPath, filename),
+    //     "utf-8",
+    //     function (err: any, content: any) {
+    //       if (err) {
+    //         vscode.window.showErrorMessage(err);
+    //         return;
+    //       }
+    //       predictions = runHeuristics(content, "");
+    //       fs.writeFile(
+    //         path.join(outputPath, filename.split(".")[0] + ".txt"),
+    //         predictions,
+    //         (err: any) => {
+    //           vscode.window.showErrorMessage(err);
+    //         }
+    //       );
     //     }
-    //   }
-    //   var finalLinks = manualLinks.concat(autoLinks);
-
-    //   fs.writeFile(filepath, JSON.stringify(finalLinks), function (err: any) {
-    //     if (err) {
-    //       vscode.window.showErrorMessage(err);
-    //       return;
-    //     }
-    //     sidebarLinksProvider._view?.webview.postMessage({
-    //       type: "configLinks",
-    //       value: finalLinks,
-    //     });
-    //   });
+    //   );
     // });
+
+    const workspace = vscode.workspace?.workspaceFolders;
+    var filepath = path.join(
+      workspace![0].uri.fsPath,
+      "violettogreen.config.json"
+    );
+    const root = workspace![0].uri.fsPath;
+    const autoLinks = runHeuristics(
+      javaText!,
+      path.relative(root, vscode.window.activeTextEditor?.document.fileName)
+    );
+    var manualLinks: any[] = [];
+
+    fs.readFile(filepath, "utf-8", function (err: any, content: any) {
+      if (err) {
+        vscode.window.showErrorMessage(err);
+        return;
+      }
+      const json = JSON.parse(content);
+
+      for (var i = 0; i < json.length; i++) {
+        if (json[i][0].type === "manual") {
+          manualLinks.push(json[i]);
+        }
+      }
+      var finalLinks = manualLinks.concat(autoLinks);
+
+      fs.writeFile(filepath, JSON.stringify(finalLinks), function (err: any) {
+        if (err) {
+          vscode.window.showErrorMessage(err);
+          return;
+        }
+        sidebarLinksProvider._view?.webview.postMessage({
+          type: "configLinks",
+          value: finalLinks,
+        });
+      });
+    });
   });
 
   // vscode.commands.registerCommand("violet-to-green.suggestComments", () => {

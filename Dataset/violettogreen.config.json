@@ -1,0 +1,22 @@
+[
+  [
+    {
+      "startLine": 19,
+      "endLine": 19,
+      "string": "// One trial for one floor",
+      "startCharacter": 32,
+      "endCharacter": 58,
+      "filepath": "ToyData\\CodeFiles\\EggDropping.java",
+      "type": "manual"
+    },
+    {
+      "startLine": 19,
+      "endLine": 19,
+      "string": "eggFloor[i][1] = 1;",
+      "startCharacter": 12,
+      "endCharacter": 31,
+      "filepath": "ToyData\\CodeFiles\\EggDropping.java",
+      "type": "manual"
+    }
+  ]
+]
